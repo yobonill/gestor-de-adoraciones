@@ -29,9 +29,16 @@ export type SongVideo = {
   blacklistReason?: string;
 };
 
+export type SongSearchIndex = {
+  title: string;
+  artist: string;
+};
+
 export type Song = {
   id: string;
   title: string;
+  artist: string;
+  search?: SongSearchIndex;
   notes: string;
   status: SongStatus;
   proposedStatus?: "approved" | "blacklisted";
@@ -45,6 +52,7 @@ export type Song = {
 export type ServiceItem = {
   songId: string;
   songTitle: string;
+  songArtist?: string;
   videoId: string;
   videoTitle: string;
   youtubeUrl: string;

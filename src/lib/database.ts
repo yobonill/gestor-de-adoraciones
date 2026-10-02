@@ -2,6 +2,8 @@ import { get, onValue, push, ref, remove, set, update } from "firebase/database"
 import { db } from "@/lib/firebase";
 import { DEFAULT_CONFIG } from "@/lib/defaultConfig";
 import { canonicalYouTubeUrl, extractYouTubeVideoId, youtubeThumbnail } from "@/lib/youtube";
+import { canonicalArtistName, uniqueArtists } from "@/lib/artists";
+import { cleanComparableText, cleanFreeText, normalizeTextKey } from "@/lib/text";
 import type { AppConfig, FilterGroup, FilterOption, ServiceItem, ServicePlan, ServiceSection, Song, SongVideo } from "@/types";
 
 function clean<T>(value: T): T {
@@ -45,9 +47,17 @@ function normalizeSong(id: string, value: Partial<Song>): Song {
     Object.entries(rawClassifications).map(([groupId, optionIds]) => [groupId, listFromRealtime<string>(optionIds)])
   );
 
+  const title = String(value.title || "");
+  const artist = String(value.artist || "");
+
   return {
     id,
-    title: String(value.title || ""),
+    title,
+    artist,
+    search: {
+      title: value.search?.title ? String(value.search.title) : normalizeTextKey(title),
+      artist: value.search?.artist ? String(value.search.artist) : normalizeTextKey(artist)
+    },
     notes: String(value.notes || ""),
     status: value.status || "pending",
     proposedStatus: value.proposedStatus,
@@ -103,20 +113,71 @@ export async function getAllSongs(): Promise<Song[]> {
   return Object.entries(raw as Record<string, Partial<Song>>).map(([id, item]) => normalizeSong(id, item));
 }
 
+function normalizeSongForStorage(song: Omit<Song, "id">, canonicalArtist: string): Omit<Song, "id"> {
+  const title = cleanComparableText(song.title);
+  const artist = cleanComparableText(canonicalArtist);
+  return {
+    ...song,
+    title,
+    artist,
+    search: {
+      title: normalizeTextKey(title),
+      artist: normalizeTextKey(artist)
+    },
+    notes: cleanFreeText(song.notes || ""),
+    blacklistReason: song.blacklistReason ? cleanFreeText(song.blacklistReason) : undefined,
+    videos: song.videos.map((video) => ({
+      ...video,
+      title: cleanComparableText(video.title || title),
+      blacklistReason: video.blacklistReason ? cleanFreeText(video.blacklistReason) : undefined
+    }))
+  };
+}
+
+function validateNormalizedConfig(config: AppConfig): AppConfig {
+  const seenGroups = new Set<string>();
+  const filterGroups = config.filterGroups.map((group) => {
+    const label = cleanComparableText(group.label);
+    const groupKey = normalizeTextKey(label);
+    if (!groupKey) throw new Error("Todos los grupos de filtros necesitan un nombre.");
+    if (seenGroups.has(groupKey)) throw new Error(`Ya existe un grupo llamado “${label}”.`);
+    seenGroups.add(groupKey);
+
+    const seenOptions = new Set<string>();
+    const options = group.options.map((option) => {
+      const optionLabel = cleanComparableText(option.label);
+      const optionKey = normalizeTextKey(optionLabel);
+      if (!optionKey) throw new Error(`Hay una opción sin nombre dentro de “${label}”.`);
+      if (seenOptions.has(optionKey)) throw new Error(`“${label}” tiene opciones duplicadas: “${optionLabel}”.`);
+      seenOptions.add(optionKey);
+      return { ...option, label: optionLabel };
+    });
+
+    return { ...group, label, options };
+  });
+
+  return { filterGroups };
+}
+
 export async function createSong(song: Omit<Song, "id">): Promise<string> {
   const songs = await getAllSongs();
+  if (!song.title.trim() || !song.artist.trim()) {
+    throw new Error("La canción necesita título y artista.");
+  }
   const incomingVideoIds = song.videos.map((video) => video.youtubeVideoId);
   const duplicate = songs.find((item) => item.videos.some((video) => incomingVideoIds.includes(video.youtubeVideoId)));
   if (duplicate) throw new Error(`Este video ya está registrado en “${duplicate.title}”.`);
 
+  const canonicalArtist = canonicalArtistName(song.artist, uniqueArtists(songs.map((item) => item.artist)));
+  const normalizedSong = normalizeSongForStorage(song, canonicalArtist);
   const newRef = push(ref(db, "songs"));
-  await set(newRef, clean(song));
+  await set(newRef, clean(normalizedSong));
   return newRef.key!;
 }
 
 export async function updateSong(song: Song): Promise<void> {
-  if (!song.title.trim() || song.videos.length === 0) {
-    throw new Error("La canción necesita título y al menos un video válido.");
+  if (!song.title.trim() || !song.artist.trim() || song.videos.length === 0) {
+    throw new Error("La canción necesita título, artista y al menos un video válido.");
   }
 
   const normalizedVideos = song.videos.map((video) => {
@@ -132,12 +193,14 @@ export async function updateSong(song: Song): Promise<void> {
   });
 
   const songs = await getAllSongs();
+  const canonicalArtist = canonicalArtistName(song.artist, uniqueArtists(songs.filter((item) => item.id !== song.id).map((item) => item.artist)));
   const videoIds = normalizedVideos.map((video) => video.youtubeVideoId);
   const duplicate = songs.find((item) => item.id !== song.id && item.videos.some((video) => videoIds.includes(video.youtubeVideoId)));
   if (duplicate) throw new Error(`Uno de los videos ya pertenece a “${duplicate.title}”.`);
 
   const { id, ...data } = { ...song, videos: normalizedVideos };
-  await set(ref(db, `songs/${id}`), clean(data));
+  const normalizedSong = normalizeSongForStorage(data, canonicalArtist);
+  await set(ref(db, `songs/${id}`), clean(normalizedSong));
 }
 
 export async function deleteSong(id: string): Promise<void> {
@@ -153,7 +216,7 @@ export async function reviewSong(song: Song, action: "approve" | "reject"): Prom
 }
 
 export async function saveConfig(config: AppConfig): Promise<void> {
-  await set(ref(db, "config"), clean(config));
+  await set(ref(db, "config"), clean(validateNormalizedConfig(config)));
 }
 
 export function subscribeServices(callback: (services: ServicePlan[]) => void): () => void {
@@ -163,20 +226,25 @@ export function subscribeServices(callback: (services: ServicePlan[]) => void): 
       ? Object.entries(raw as Record<string, Partial<ServicePlan>>).map(([id, item]) => normalizeService(id, item))
       : [];
     services.sort((a, b) => b.date.localeCompare(a.date));
-    callback(services.slice(0, 30));
+    callback(services);
   });
 }
 
 export async function saveService(plan: ServicePlan): Promise<string> {
   const now = new Date().toISOString();
-  if (plan.id) {
-    const { id, ...data } = plan;
+  const normalizedPlan: ServicePlan = {
+    ...plan,
+    title: cleanComparableText(plan.title),
+    sections: plan.sections.map((section) => ({ ...section, label: cleanComparableText(section.label) }))
+  };
+  if (normalizedPlan.id) {
+    const { id, ...data } = normalizedPlan;
     await set(ref(db, `servicePlans/${id}`), clean({ ...data, updatedAt: now }));
     return id;
   }
 
   const newRef = push(ref(db, "servicePlans"));
-  const { id: _ignored, ...data } = plan;
+  const { id: _ignored, ...data } = normalizedPlan;
   await set(newRef, clean({ ...data, createdAt: now, updatedAt: now }));
   return newRef.key!;
 }

@@ -4,12 +4,14 @@ export function FilterChips({
   group,
   selected,
   onChange,
-  forceMultiSelect = false
+  forceMultiSelect = false,
+  invalid = false
 }: {
   group: FilterGroup;
   selected: string[];
   onChange: (next: string[]) => void;
   forceMultiSelect?: boolean;
+  invalid?: boolean;
 }) {
   function toggle(optionId: string) {
     if (group.multiSelect || forceMultiSelect) {
@@ -20,7 +22,7 @@ export function FilterChips({
   }
 
   return (
-    <div className="filter-group">
+    <div className={`filter-group ${invalid ? "filter-group-invalid" : ""}`}>
       <div className="field-label">{group.label}</div>
       <div className="chips">
         {group.options.filter((option) => option.active).map((option) => (
@@ -34,6 +36,7 @@ export function FilterChips({
           </button>
         ))}
       </div>
+      {invalid && <div className="field-error">Selecciona al menos una opción.</div>}
     </div>
   );
 }

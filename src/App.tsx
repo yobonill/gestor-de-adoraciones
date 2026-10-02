@@ -10,7 +10,7 @@ import { subscribeConfig, subscribeSongs } from "@/lib/database";
 type Tab = "add" | "search" | "service" | "config";
 
 export function App() {
-  const [tab, setTab] = useState<Tab>("service");
+  const [tab, setTab] = useState<Tab>("add");
   const [config, setConfig] = useState<AppConfig>(DEFAULT_CONFIG);
   const [songs, setSongs] = useState<Song[]>([]);
   const [loading, setLoading] = useState(true);
@@ -64,17 +64,17 @@ export function App() {
 
       <section className="content-card">
         {dataError && <div className="notice warning">{dataError}</div>}
-        {!dataError && tab === "add" && <AddSongPanel config={config} songs={songs} onSubmitted={() => setTab("search")} />}
+        {!dataError && tab === "add" && <AddSongPanel config={config} songs={songs} />}
         {!dataError && tab === "search" && <SearchPanel config={config} songs={songs} />}
         {!dataError && tab === "service" && <ServicePlanner config={config} songs={songs.filter((song) => song.status === "approved")} />}
         {!dataError && tab === "config" && <ConfigPanel config={config} songs={songs} />}
       </section>
 
       <nav className="bottom-nav" aria-label="Navegación principal">
-        <button className={tab === "add" ? "active" : ""} onClick={() => setTab("add")}>＋<span>Agregar</span></button>
-        <button className={tab === "search" ? "active" : ""} onClick={() => setTab("search")}>⌕<span>Buscar</span></button>
-        <button className={tab === "service" ? "active" : ""} onClick={() => setTab("service")}>♫<span>Culto</span></button>
-        <button className={tab === "config" ? "active" : ""} onClick={() => setTab("config")}>⚙<span>Config</span></button>
+        <button className={tab === "add" ? "active" : ""} aria-current={tab === "add" ? "page" : undefined} onClick={() => setTab("add")}>＋<span>Nueva canción</span></button>
+        <button className={tab === "search" ? "active" : ""} aria-current={tab === "search" ? "page" : undefined} onClick={() => setTab("search")}>⌕<span>Canciones</span></button>
+        <button className={tab === "service" ? "active" : ""} aria-current={tab === "service" ? "page" : undefined} onClick={() => setTab("service")}>♫<span>Culto</span></button>
+        <button className={tab === "config" ? "active" : ""} aria-current={tab === "config" ? "page" : undefined} onClick={() => setTab("config")}>⚙<span>Config</span></button>
       </nav>
     </main>
   );

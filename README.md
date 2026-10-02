@@ -70,3 +70,13 @@ VITE_ADMIN_CODE
 ```
 
 Después, en GitHub > Settings > Pages, selecciona **GitHub Actions** como Source.
+
+## Comportamiento de Agregar canción
+
+- Al revisar un enlace válido de YouTube, la app intenta obtener automáticamente el título mediante oEmbed de YouTube.
+- El título obtenido siempre queda editable antes de enviar.
+- Si YouTube no devuelve el título, se muestra el mensaje: `No se pudo obtener el nombre de YouTube. Escríbelo manualmente.`
+- El envío valida título, todos los grupos de filtros activos y el motivo cuando se marca como no apta.
+- El botón de enviar siempre da feedback de los campos pendientes; no se bloquea silenciosamente por falta de título.
+- El borrador de Agregar se conserva al cambiar entre pestañas y también ante un remount de la app en el navegador.
+- El botón **Limpiar** borra explícitamente el borrador actual.
