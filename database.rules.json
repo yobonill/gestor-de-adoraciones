@@ -1,0 +1,27 @@
+{
+  "rules": {
+    "songs": {
+      ".read": true,
+      "$songId": {
+        ".write": true,
+        ".validate": "!newData.exists() || (newData.hasChildren(['title', 'status', 'videos']) && newData.child('title').isString() && newData.child('title').val().length > 0 && (newData.child('status').val() === 'pending' || newData.child('status').val() === 'approved' || newData.child('status').val() === 'blacklisted' || newData.child('status').val() === 'rejected'))"
+      }
+    },
+    "servicePlans": {
+      ".read": true,
+      "$planId": {
+        ".write": true,
+        ".validate": "!newData.exists() || (newData.hasChildren(['title', 'date', 'kind', 'sections']) && newData.child('title').isString() && newData.child('date').isString() && (newData.child('kind').val() === 'single' || newData.child('kind').val() === 'weekend'))"
+      }
+    },
+    "config": {
+      ".read": true,
+      ".write": true,
+      ".validate": "!newData.exists() || newData.hasChild('filterGroups')"
+    },
+    "$other": {
+      ".read": false,
+      ".write": false
+    }
+  }
+}
