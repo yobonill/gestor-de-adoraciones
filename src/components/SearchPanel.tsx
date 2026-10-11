@@ -3,11 +3,15 @@ import type { AppConfig, Song, SongVideo } from "@/types";
 import { deleteSong, updateSong } from "@/lib/database";
 import { requireAdminCode } from "@/lib/adminCode";
 import { songMatchesFilters } from "@/lib/filters";
-import { canonicalYouTubeUrl, extractYouTubeVideoId, youtubeThumbnail } from "@/lib/youtube";
+import { canonicalYouTubeUrl, extractYouTubeVideoId, fetchYouTubeDuration, youtubeThumbnail } from "@/lib/youtube";
 import { artistMatches, uniqueArtists } from "@/lib/artists";
 import { ArtistAutocomplete } from "./ArtistAutocomplete";
 import { normalizeTextKey } from "@/lib/text";
 import { FilterChips } from "./FilterChips";
+import { SongDetailsModal } from "./SongDetailsModal";
+import { DurationInput } from "./DurationInput";
+import { formatDuration } from "@/lib/duration";
+import { ensurePrimaryVideo, getPrimaryUsableVideo, markPrimaryVideo, preferredUsableVideo, updateVideoStatus } from "@/lib/videos";
 
 function cloneSong(song: Song): Song {
   return JSON.parse(JSON.stringify(song)) as Song;
@@ -18,11 +22,13 @@ export function SearchPanel({ config, songs }: { config: AppConfig; songs: Song[
   const [filters, setFilters] = useState<Record<string, string[]>>({});
   const [artistFilter, setArtistFilter] = useState("");
   const [editing, setEditing] = useState<Song | null>(null);
+  const [detailsSong, setDetailsSong] = useState<{ song: Song; videoId?: string } | null>(null);
   const [showBlacklisted, setShowBlacklisted] = useState(false);
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
   const artists = useMemo(() => uniqueArtists(songs.map((song) => song.artist)), [songs]);
   const hasActiveFilters = Boolean(artistFilter || showBlacklisted || (Object.values(filters) as string[][]).some((items) => items.length > 0));
+  const selectedVideoTypes = filters["video-type"] || [];
 
   const results = useMemo(() => {
     const q = normalizeTextKey(query);
@@ -31,7 +37,8 @@ export function SearchPanel({ config, songs }: { config: AppConfig; songs: Song[
       if (song.status === "blacklisted" && !showBlacklisted) return false;
       const titleKey = song.search?.title || normalizeTextKey(song.title);
       const artistKey = song.search?.artist || normalizeTextKey(song.artist);
-      const textMatch = !q || titleKey.includes(q) || artistKey.includes(q) || song.videos.some((video) => normalizeTextKey(video.youtubeUrl).includes(q));
+      const lyricsKey = song.search?.lyrics || normalizeTextKey(song.lyrics || "");
+      const textMatch = !q || titleKey.includes(q) || artistKey.includes(q) || lyricsKey.includes(q) || song.videos.some((video) => normalizeTextKey(video.youtubeUrl).includes(q));
       const artistMatch = !artistFilter || artistMatches(song.artist, artistFilter);
       return textMatch && artistMatch && songMatchesFilters(song, filters);
     });
@@ -79,23 +86,12 @@ export function SearchPanel({ config, songs }: { config: AppConfig; songs: Song[
           <span className="eyebrow">Catálogo</span>
           <h2>Buscar canciones</h2>
         </div>
-        <span className="muted">Combina varios filtros para reducir la lista.</span>
+        <span className="muted">También puedes buscar palabras o frases dentro de la letra.</span>
       </div>
 
       <div className="filters-card">
         <div className="card-actions" style={{ justifyContent: "flex-end", marginBottom: 12 }}>
-          <button
-            className="ghost"
-            type="button"
-            disabled={!hasActiveFilters}
-            onClick={() => {
-              setFilters({});
-              setArtistFilter("");
-              setShowBlacklisted(false);
-            }}
-          >
-            Limpiar filtros
-          </button>
+          <button className="ghost" type="button" disabled={!hasActiveFilters} onClick={() => { setFilters({}); setArtistFilter(""); setShowBlacklisted(false); }}>Limpiar filtros</button>
         </div>
         <div className="filter-group">
           <label className="field-label" htmlFor="artist-filter">Artista</label>
@@ -113,18 +109,22 @@ export function SearchPanel({ config, songs }: { config: AppConfig; songs: Song[
         </label>
       </div>
 
-      <input className="search-input" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Buscar por nombre, artista o enlace…" />
+      <input className="search-input" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Buscar por nombre, artista, letra o enlace…" />
 
       {message && <div className="notice">{message}</div>}
       <div className="result-count">{results.length} resultado{results.length === 1 ? "" : "s"}</div>
 
       <div className="song-grid">
-        {results.map((song) => (
+        {results.map((song) => {
+          const displayVideo = preferredUsableVideo(song.videos, selectedVideoTypes) || getPrimaryUsableVideo(song.videos) || song.videos[0];
+          return (
           <article className="song-card" key={song.id}>
-            {song.videos[0]?.thumbnailUrl && <img className="song-thumb" src={song.videos[0].thumbnailUrl} alt="" width={320} height={180} />}
+            {displayVideo?.thumbnailUrl && <img className="song-thumb" src={displayVideo.thumbnailUrl} alt="" width={320} height={180} />}
             <div className="song-card-body">
               <div className="pending-title-row"><h3>{song.title}</h3>{song.status === "blacklisted" && <span className="status-badge danger">Blacklist</span>}</div>
               <div className="song-artist">{song.artist || "Artista sin registrar"}</div>
+              {displayVideo && <div className="song-duration">Duración: {formatDuration(displayVideo.durationSeconds)}</div>}
+              {selectedVideoTypes.length > 0 && displayVideo && <div className="picker-meta">Coincidencia: {displayVideo.videoTypeIds.map((id) => optionLabel("video-type", id)).join(", ") || "Video usable"}{displayVideo.isPrimary ? " · Principal" : ""}</div>}
               {song.status === "blacklisted" && song.blacklistReason && <p className="card-note"><strong>Motivo:</strong> {song.blacklistReason}</p>}
               <div className="tag-row">
                 {(Object.entries(song.classifications) as [string, string[]][]).flatMap(([groupId, ids]) => ids.map((id) => <span className="tag" key={`${groupId}-${id}`}>{optionLabel(groupId, id)}</span>))}
@@ -135,16 +135,19 @@ export function SearchPanel({ config, songs }: { config: AppConfig; songs: Song[
                   <a key={video.id} href={video.youtubeUrl} target="_blank" rel="noreferrer" className="secondary-button">▶ {video.videoTypeIds[0] ? optionLabel("video-type", video.videoTypeIds[0]) : "YouTube"}</a>
                 ))}
               </div>
-              <div className="card-actions">
+              <div className="card-actions catalog-actions">
+                <button type="button" className="secondary" onClick={() => setDetailsSong({ song, videoId: displayVideo?.id })}>{song.lyrics?.trim() ? "Ver letra" : "Ver detalles"}</button>
                 <button type="button" className="ghost" onClick={() => setEditing(cloneSong(song))}>Editar</button>
                 <button type="button" className="ghost danger-text" onClick={() => void removeSong(song)} disabled={busy}>Eliminar</button>
               </div>
             </div>
           </article>
-        ))}
+          );
+        })}
       </div>
 
       {editing && <EditSongModal song={editing} allSongs={songs} config={config} onChange={setEditing} onClose={() => setEditing(null)} onSave={() => void saveEdit()} busy={busy} />}
+      {detailsSong && <SongDetailsModal song={detailsSong.song} selectedVideoId={detailsSong.videoId} config={config} onClose={() => setDetailsSong(null)} />}
     </div>
   );
 }
@@ -160,6 +163,8 @@ function EditSongModal({ song, allSongs, config, onChange, onClose, onSave, busy
 }) {
   const [newVideoUrl, setNewVideoUrl] = useState("");
   const [videoMessage, setVideoMessage] = useState("");
+  const [addingVideo, setAddingVideo] = useState(false);
+  const [durationLookupId, setDurationLookupId] = useState<string | null>(null);
   const videoTypeGroup = config.filterGroups.find((g) => g.id === "video-type");
   const artists = useMemo(() => uniqueArtists(allSongs.map((item) => item.artist)), [allSongs]);
 
@@ -168,10 +173,41 @@ function EditSongModal({ song, allSongs, config, onChange, onClose, onSave, busy
   }
 
   function patchVideo(index: number, value: Partial<SongVideo>) {
-    patch({ videos: song.videos.map((video, i) => i === index ? { ...video, ...value } : video) });
+    patch({ videos: ensurePrimaryVideo(song.videos.map((video, i) => i === index ? { ...video, ...value } : video)) });
   }
 
-  function addVideo() {
+  function setVideoStatus(index: number, status: SongVideo["status"]) {
+    patch({ videos: updateVideoStatus(song.videos, song.videos[index]?.id || "", status) });
+  }
+
+  function setPrimary(videoId: string) {
+    patch({ videos: markPrimaryVideo(song.videos, videoId) });
+  }
+
+  function removeVideo(index: number) {
+    patch({ videos: ensurePrimaryVideo(song.videos.filter((_, i) => i !== index)) });
+  }
+
+  async function refreshDuration(index: number) {
+    const video = song.videos[index];
+    const videoId = extractYouTubeVideoId(video.youtubeUrl);
+    if (!videoId) {
+      setVideoMessage("No se puede obtener la duración porque el enlace de YouTube no es válido.");
+      return;
+    }
+    setDurationLookupId(video.id);
+    setVideoMessage("");
+    const duration = await fetchYouTubeDuration(videoId);
+    setDurationLookupId(null);
+    if (!duration) {
+      setVideoMessage("No se pudo obtener la duración desde YouTube. Puedes introducirla manualmente.");
+      return;
+    }
+    patchVideo(index, { durationSeconds: duration });
+    setVideoMessage(`Duración actualizada desde YouTube: ${formatDuration(duration)}.`);
+  }
+
+  async function addVideo() {
     setVideoMessage("");
     const videoId = extractYouTubeVideoId(newVideoUrl);
     if (!videoId) {
@@ -187,18 +223,24 @@ function EditSongModal({ song, allSongs, config, onChange, onClose, onSave, busy
       setVideoMessage("Ese video ya está agregado a esta canción.");
       return;
     }
+    setAddingVideo(true);
+    const durationSeconds = await fetchYouTubeDuration(videoId) || 0;
     patch({
-      videos: [...song.videos, {
+      videos: ensurePrimaryVideo([...song.videos, {
         id: crypto.randomUUID(),
         youtubeVideoId: videoId,
         youtubeUrl: canonicalYouTubeUrl(videoId),
         title: song.title,
         thumbnailUrl: youtubeThumbnail(videoId),
         videoTypeIds: [],
-        status: "usable"
-      }]
+        status: "usable",
+        isPrimary: false,
+        durationSeconds
+      }])
     });
     setNewVideoUrl("");
+    setVideoMessage(durationSeconds ? `Video agregado. Duración detectada: ${formatDuration(durationSeconds)}.` : "Video agregado. No se pudo detectar la duración; agrégala manualmente.");
+    setAddingVideo(false);
   }
 
   return (
@@ -214,6 +256,9 @@ function EditSongModal({ song, allSongs, config, onChange, onClose, onSave, busy
 
         <label className="field-label">Artista</label>
         <ArtistAutocomplete value={song.artist} artists={artists} onChange={(value) => patch({ artist: value })} />
+
+        <label className="field-label">Letra de la canción</label>
+        <textarea className="lyrics-input" value={song.lyrics || ""} onChange={(e) => patch({ lyrics: e.target.value })} placeholder="Pega la letra aquí…" />
 
         {config.filterGroups.filter((group) => group.id !== "video-type").map((group) => (
           <FilterChips key={group.id} group={group} selected={song.classifications[group.id] || []} onChange={(value) => patch({ classifications: { ...song.classifications, [group.id]: value } })} />
@@ -242,16 +287,22 @@ function EditSongModal({ song, allSongs, config, onChange, onClose, onSave, busy
                   const youtubeVideoId = extractYouTubeVideoId(e.target.value) || video.youtubeVideoId;
                   patchVideo(index, { youtubeUrl: e.target.value, youtubeVideoId, thumbnailUrl: youtubeThumbnail(youtubeVideoId) });
                 }} />
-                <button type="button" className="icon-button danger-text" title="Quitar video" onClick={() => patch({ videos: song.videos.filter((_, i) => i !== index) })}>×</button>
+                <button type="button" className="icon-button danger-text" title="Quitar video" onClick={() => removeVideo(index)}>×</button>
               </div>
+              <div className="subheading-row compact-heading">
+                <label className="field-label">Duración</label>
+                <button type="button" className="ghost compact-button" disabled={durationLookupId === video.id} onClick={() => void refreshDuration(index)}>{durationLookupId === video.id ? "Consultando…" : "↻ Obtener de YouTube"}</button>
+              </div>
+              <DurationInput value={video.durationSeconds} onChange={(value) => patchVideo(index, { durationSeconds: value })} idPrefix={`edit-video-${video.id}`} compact />
               {videoTypeGroup && <FilterChips group={videoTypeGroup} selected={video.videoTypeIds || []} onChange={(value) => patchVideo(index, { videoTypeIds: value })} />}
               <div className="filter-group">
                 <div className="field-label">Estado del video</div>
                 <div className="chips compact">
-                  <button type="button" className={`chip ${video.status === "usable" ? "selected" : ""}`} onClick={() => patchVideo(index, { status: "usable" })}>Usable</button>
-                  <button type="button" className={`chip danger-chip ${video.status === "blacklisted" ? "selected" : ""}`} onClick={() => patchVideo(index, { status: "blacklisted" })}>No usar esta versión</button>
+                  <button type="button" className={`chip ${video.status === "usable" ? "selected" : ""}`} onClick={() => setVideoStatus(index, "usable")}>Usable</button>
+                  <button type="button" className={`chip danger-chip ${video.status === "blacklisted" ? "selected" : ""}`} onClick={() => setVideoStatus(index, "blacklisted")}>No usar esta versión</button>
                 </div>
               </div>
+              {video.status === "usable" && <div className="filter-group"><div className="field-label">Video predeterminado</div><div className="chips compact"><button type="button" className={`chip ${video.isPrimary ? "selected" : ""}`} onClick={() => setPrimary(video.id)}>{video.isPrimary ? "★ Principal" : "Hacer principal"}</button></div></div>}
               {video.status === "blacklisted" && <textarea value={video.blacklistReason || ""} onChange={(e) => patchVideo(index, { blacklistReason: e.target.value })} placeholder="Motivo…" />}
             </div>
           ))}
@@ -259,9 +310,9 @@ function EditSongModal({ song, allSongs, config, onChange, onClose, onSave, busy
 
         <div className="inline-add">
           <input value={newVideoUrl} onChange={(e) => setNewVideoUrl(e.target.value)} placeholder="Agregar otra versión de YouTube" />
-          <button type="button" className="secondary" onClick={addVideo} disabled={!newVideoUrl.trim()}>+ Video</button>
+          <button type="button" className="secondary" onClick={() => void addVideo()} disabled={!newVideoUrl.trim() || addingVideo}>{addingVideo ? "Revisando…" : "+ Video"}</button>
         </div>
-        {videoMessage && <div className="notice warning">{videoMessage}</div>}
+        {videoMessage && <div className="notice">{videoMessage}</div>}
 
         <div className="modal-actions">
           <button className="secondary" type="button" onClick={onClose}>Cancelar</button>

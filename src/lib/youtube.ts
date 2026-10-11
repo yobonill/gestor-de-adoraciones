@@ -56,3 +56,125 @@ export async function fetchYouTubeMetadata(videoId: string): Promise<YouTubeMeta
 
   return { title, artist };
 }
+
+type YTPlayer = {
+  getDuration: () => number;
+  destroy: () => void;
+};
+
+type YTPlayerEvent = { target: YTPlayer };
+
+type YTNamespace = {
+  Player: new (element: HTMLElement, options: {
+    videoId: string;
+    playerVars?: Record<string, string | number>;
+    events?: {
+      onReady?: (event: YTPlayerEvent) => void;
+      onError?: () => void;
+    };
+  }) => YTPlayer;
+};
+
+declare global {
+  interface Window {
+    YT?: YTNamespace;
+    onYouTubeIframeAPIReady?: () => void;
+  }
+}
+
+let iframeApiPromise: Promise<YTNamespace> | null = null;
+
+function loadYouTubeIframeApi(): Promise<YTNamespace> {
+  if (window.YT?.Player) return Promise.resolve(window.YT);
+  if (iframeApiPromise) return iframeApiPromise;
+
+  iframeApiPromise = new Promise<YTNamespace>((resolve, reject) => {
+    const existingScript = document.getElementById("youtube-iframe-api");
+    const previousReady = window.onYouTubeIframeAPIReady;
+    const timeout = window.setTimeout(() => reject(new Error("YouTube player API timeout.")), 10000);
+
+    window.onYouTubeIframeAPIReady = () => {
+      previousReady?.();
+      if (window.YT?.Player) {
+        window.clearTimeout(timeout);
+        resolve(window.YT);
+      } else {
+        window.clearTimeout(timeout);
+        reject(new Error("YouTube player API unavailable."));
+      }
+    };
+
+    if (!existingScript) {
+      const script = document.createElement("script");
+      script.id = "youtube-iframe-api";
+      script.src = "https://www.youtube.com/iframe_api";
+      script.async = true;
+      script.onerror = () => {
+        window.clearTimeout(timeout);
+        reject(new Error("Could not load YouTube player API."));
+      };
+      document.head.appendChild(script);
+    }
+  }).catch((error) => {
+    iframeApiPromise = null;
+    throw error;
+  });
+
+  return iframeApiPromise;
+}
+
+/**
+ * Best-effort duration lookup using YouTube's public IFrame Player API.
+ * It requires no YouTube Data API key. If YouTube/browser restrictions prevent
+ * the lookup, callers should fall back to manual minutes/seconds entry.
+ */
+export async function fetchYouTubeDuration(videoId: string): Promise<number | null> {
+  try {
+    const YT = await loadYouTubeIframeApi();
+    return await new Promise<number | null>((resolve) => {
+      const host = document.createElement("div");
+      host.style.position = "fixed";
+      host.style.left = "-9999px";
+      host.style.top = "-9999px";
+      host.style.width = "1px";
+      host.style.height = "1px";
+      host.style.overflow = "hidden";
+      host.setAttribute("aria-hidden", "true");
+      document.body.appendChild(host);
+
+      let settled = false;
+      let player: YTPlayer | null = null;
+      const finish = (value: number | null) => {
+        if (settled) return;
+        settled = true;
+        window.clearTimeout(timeout);
+        try { player?.destroy(); } catch { /* noop */ }
+        host.remove();
+        resolve(value && value > 0 ? Math.round(value) : null);
+      };
+
+      const timeout = window.setTimeout(() => finish(null), 9000);
+      try {
+        player = new YT.Player(host, {
+          videoId,
+          playerVars: { controls: 0, playsinline: 1 },
+          events: {
+            onReady: (event) => {
+              const first = event.target.getDuration();
+              if (first > 0) {
+                finish(first);
+                return;
+              }
+              window.setTimeout(() => finish(event.target.getDuration()), 500);
+            },
+            onError: () => finish(null)
+          }
+        });
+      } catch {
+        finish(null);
+      }
+    });
+  } catch {
+    return null;
+  }
+}

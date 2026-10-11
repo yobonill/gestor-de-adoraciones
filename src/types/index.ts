@@ -26,23 +26,28 @@ export type SongVideo = {
   thumbnailUrl: string;
   videoTypeIds: string[];
   status: VideoStatus;
+  isPrimary?: boolean;
+  durationSeconds?: number;
   blacklistReason?: string;
 };
 
 export type SongSearchIndex = {
   title: string;
   artist: string;
+  lyrics?: string;
 };
 
 export type Song = {
   id: string;
   title: string;
   artist: string;
+  lyrics?: string;
   search?: SongSearchIndex;
   notes: string;
   status: SongStatus;
   proposedStatus?: "approved" | "blacklisted";
   blacklistReason?: string;
+  rejectionReason?: string;
   classifications: Record<string, string[]>;
   videos: SongVideo[];
   createdAt?: string;
@@ -57,6 +62,7 @@ export type ServiceItem = {
   videoTitle: string;
   youtubeUrl: string;
   videoTypeLabel?: string;
+  durationSeconds?: number;
 };
 
 export type ServiceSection = {
@@ -74,4 +80,12 @@ export type ServicePlan = {
   sections: ServiceSection[];
   createdAt?: string;
   updatedAt?: string;
+};
+
+export type AppBackup = {
+  schemaVersion: number;
+  exportedAt: string;
+  config: AppConfig;
+  songs: Song[];
+  servicePlans: ServicePlan[];
 };

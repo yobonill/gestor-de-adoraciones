@@ -4,6 +4,8 @@ import { DEFAULT_CONFIG } from "@/lib/defaultConfig";
 import { canonicalYouTubeUrl, extractYouTubeVideoId, youtubeThumbnail } from "@/lib/youtube";
 import { canonicalArtistName, uniqueArtists } from "@/lib/artists";
 import { cleanComparableText, cleanFreeText, normalizeTextKey } from "@/lib/text";
+import { sanitizeDurationSeconds } from "@/lib/duration";
+import { ensurePrimaryVideo } from "@/lib/videos";
 import type { AppConfig, FilterGroup, FilterOption, ServiceItem, ServicePlan, ServiceSection, Song, SongVideo } from "@/types";
 
 function clean<T>(value: T): T {
@@ -35,6 +37,8 @@ function normalizeVideo(value: Partial<SongVideo>): SongVideo {
     thumbnailUrl: String(value.thumbnailUrl || ""),
     videoTypeIds: listFromRealtime<string>(value.videoTypeIds),
     status: value.status === "blacklisted" ? "blacklisted" : "usable",
+    isPrimary: Boolean(value.isPrimary),
+    durationSeconds: sanitizeDurationSeconds(value.durationSeconds),
     blacklistReason: value.blacklistReason ? String(value.blacklistReason) : undefined
   };
 }
@@ -49,23 +53,40 @@ function normalizeSong(id: string, value: Partial<Song>): Song {
 
   const title = String(value.title || "");
   const artist = String(value.artist || "");
+  const lyrics = String(value.lyrics || "");
 
   return {
     id,
     title,
     artist,
+    lyrics,
     search: {
       title: value.search?.title ? String(value.search.title) : normalizeTextKey(title),
-      artist: value.search?.artist ? String(value.search.artist) : normalizeTextKey(artist)
+      artist: value.search?.artist ? String(value.search.artist) : normalizeTextKey(artist),
+      lyrics: value.search?.lyrics ? String(value.search.lyrics) : normalizeTextKey(lyrics)
     },
     notes: String(value.notes || ""),
     status: value.status || "pending",
     proposedStatus: value.proposedStatus,
     blacklistReason: value.blacklistReason ? String(value.blacklistReason) : undefined,
+    rejectionReason: value.rejectionReason ? String(value.rejectionReason) : undefined,
     classifications,
-    videos: listFromRealtime<Partial<SongVideo>>(value.videos).map(normalizeVideo),
+    videos: ensurePrimaryVideo(listFromRealtime<Partial<SongVideo>>(value.videos).map(normalizeVideo)),
     createdAt: value.createdAt,
     updatedAt: value.updatedAt
+  };
+}
+
+function normalizeServiceItem(value: Partial<ServiceItem>): ServiceItem {
+  return {
+    songId: String(value.songId || ""),
+    songTitle: String(value.songTitle || ""),
+    songArtist: value.songArtist ? String(value.songArtist) : undefined,
+    videoId: String(value.videoId || ""),
+    videoTitle: String(value.videoTitle || ""),
+    youtubeUrl: String(value.youtubeUrl || ""),
+    videoTypeLabel: value.videoTypeLabel ? String(value.videoTypeLabel) : undefined,
+    durationSeconds: sanitizeDurationSeconds(value.durationSeconds)
   };
 }
 
@@ -74,7 +95,7 @@ function normalizeSection(value: Partial<ServiceSection>): ServiceSection {
     id: String(value.id || crypto.randomUUID()),
     label: String(value.label || "Canciones"),
     date: value.date,
-    items: listFromRealtime<ServiceItem>(value.items)
+    items: listFromRealtime<Partial<ServiceItem>>(value.items).map(normalizeServiceItem)
   };
 }
 
@@ -113,22 +134,36 @@ export async function getAllSongs(): Promise<Song[]> {
   return Object.entries(raw as Record<string, Partial<Song>>).map(([id, item]) => normalizeSong(id, item));
 }
 
+export async function getAllServices(): Promise<ServicePlan[]> {
+  const snapshot = await get(ref(db, "servicePlans"));
+  const raw = snapshot.val();
+  if (!raw || typeof raw !== "object") return [];
+  const services = Object.entries(raw as Record<string, Partial<ServicePlan>>).map(([id, item]) => normalizeService(id, item));
+  services.sort((a, b) => b.date.localeCompare(a.date));
+  return services;
+}
+
 function normalizeSongForStorage(song: Omit<Song, "id">, canonicalArtist: string): Omit<Song, "id"> {
   const title = cleanComparableText(song.title);
   const artist = cleanComparableText(canonicalArtist);
+  const lyrics = cleanFreeText(song.lyrics || "");
   return {
     ...song,
     title,
     artist,
+    lyrics,
     search: {
       title: normalizeTextKey(title),
-      artist: normalizeTextKey(artist)
+      artist: normalizeTextKey(artist),
+      lyrics: normalizeTextKey(lyrics)
     },
     notes: cleanFreeText(song.notes || ""),
     blacklistReason: song.blacklistReason ? cleanFreeText(song.blacklistReason) : undefined,
-    videos: song.videos.map((video) => ({
+    rejectionReason: song.rejectionReason ? cleanFreeText(song.rejectionReason) : undefined,
+    videos: ensurePrimaryVideo(song.videos).map((video) => ({
       ...video,
       title: cleanComparableText(video.title || title),
+      durationSeconds: sanitizeDurationSeconds(video.durationSeconds),
       blacklistReason: video.blacklistReason ? cleanFreeText(video.blacklistReason) : undefined
     }))
   };
@@ -180,7 +215,7 @@ export async function updateSong(song: Song): Promise<void> {
     throw new Error("La canción necesita título, artista y al menos un video válido.");
   }
 
-  const normalizedVideos = song.videos.map((video) => {
+  const normalizedVideos = ensurePrimaryVideo(song.videos.map((video) => {
     const youtubeVideoId = extractYouTubeVideoId(video.youtubeUrl);
     if (!youtubeVideoId) throw new Error("Uno de los enlaces de YouTube no es válido.");
     return {
@@ -188,9 +223,10 @@ export async function updateSong(song: Song): Promise<void> {
       youtubeVideoId,
       youtubeUrl: canonicalYouTubeUrl(youtubeVideoId),
       thumbnailUrl: video.thumbnailUrl || youtubeThumbnail(youtubeVideoId),
-      videoTypeIds: video.videoTypeIds || []
+      videoTypeIds: video.videoTypeIds || [],
+      durationSeconds: sanitizeDurationSeconds(video.durationSeconds)
     };
-  });
+  }));
 
   const songs = await getAllSongs();
   const canonicalArtist = canonicalArtistName(song.artist, uniqueArtists(songs.filter((item) => item.id !== song.id).map((item) => item.artist)));
@@ -207,12 +243,16 @@ export async function deleteSong(id: string): Promise<void> {
   await remove(ref(db, `songs/${id}`));
 }
 
-export async function reviewSong(song: Song, action: "approve" | "reject"): Promise<void> {
+export async function reviewSong(song: Song, action: "approve" | "reject", rejectionReason = ""): Promise<void> {
   const now = new Date().toISOString();
   const status = action === "approve"
     ? (song.proposedStatus === "blacklisted" ? "blacklisted" : "approved")
     : "rejected";
-  await update(ref(db, `songs/${song.id}`), { status, updatedAt: now });
+  await update(ref(db, `songs/${song.id}`), clean({
+    status,
+    updatedAt: now,
+    rejectionReason: action === "reject" ? cleanFreeText(rejectionReason) : ""
+  }));
 }
 
 export async function saveConfig(config: AppConfig): Promise<void> {
@@ -235,7 +275,11 @@ export async function saveService(plan: ServicePlan): Promise<string> {
   const normalizedPlan: ServicePlan = {
     ...plan,
     title: cleanComparableText(plan.title),
-    sections: plan.sections.map((section) => ({ ...section, label: cleanComparableText(section.label) }))
+    sections: plan.sections.map((section) => ({
+      ...section,
+      label: cleanComparableText(section.label),
+      items: section.items.map((item) => ({ ...item, durationSeconds: sanitizeDurationSeconds(item.durationSeconds) }))
+    }))
   };
   if (normalizedPlan.id) {
     const { id, ...data } = normalizedPlan;

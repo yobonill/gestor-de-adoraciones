@@ -5,6 +5,9 @@ import { requireAdminCode } from "@/lib/adminCode";
 import { songMatchesFilters } from "@/lib/filters";
 import { FilterChips } from "./FilterChips";
 import { normalizeTextKey } from "@/lib/text";
+import { formatDuration, sanitizeDurationSeconds } from "@/lib/duration";
+import { SongDetailsModal } from "./SongDetailsModal";
+import { getPrimaryUsableVideo, preferredUsableVideo, usableVideosMatchingTypes } from "@/lib/videos";
 
 function todayLocal() {
   const now = new Date();
@@ -35,11 +38,7 @@ type SongUsage = {
 function formatServiceDate(date: string) {
   const [year, month, day] = date.split("-").map(Number);
   if (!year || !month || !day) return date;
-  return new Intl.DateTimeFormat("es-DO", {
-    day: "numeric",
-    month: "short",
-    year: "numeric"
-  }).format(new Date(Date.UTC(year, month - 1, day)));
+  return new Intl.DateTimeFormat("es-DO", { day: "numeric", month: "short", year: "numeric" }).format(new Date(Date.UTC(year, month - 1, day)));
 }
 
 export function ServicePlanner({ config, songs }: { config: AppConfig; songs: Song[] }) {
@@ -49,6 +48,7 @@ export function ServicePlanner({ config, songs }: { config: AppConfig; songs: So
   const [filters, setFilters] = useState<Record<string, string[]>>({});
   const [query, setQuery] = useState("");
   const [selectedVideo, setSelectedVideo] = useState<Record<string, string>>({});
+  const [details, setDetails] = useState<{ song: Song; videoId?: string } | null>(null);
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
 
@@ -58,43 +58,36 @@ export function ServicePlanner({ config, songs }: { config: AppConfig; songs: So
 
   useEffect(() => subscribeServices(setServices), []);
 
+  const songsById = useMemo(() => new Map(songs.map((song) => [song.id, song])), [songs]);
+  const selectedVideoTypes = filters["video-type"] || [];
+
   const filteredSongs = useMemo(() => {
     const q = normalizeTextKey(query);
     return songs.filter((song) => {
       const titleKey = song.search?.title || normalizeTextKey(song.title);
       const artistKey = song.search?.artist || normalizeTextKey(song.artist);
-      const textMatch = !q || titleKey.includes(q) || artistKey.includes(q);
+      const lyricsKey = song.search?.lyrics || normalizeTextKey(song.lyrics || "");
+      const textMatch = !q || titleKey.includes(q) || artistKey.includes(q) || lyricsKey.includes(q);
       return textMatch && songMatchesFilters(song, filters);
     });
   }, [songs, query, filters]);
 
   const lastUsageBySong = useMemo(() => {
     const usage = new Map<string, SongUsage>();
-
     for (const service of services) {
-      // When editing a saved service, don't count that same service as previous usage.
       if (plan.id && service.id === plan.id) continue;
-
       for (const section of service.sections) {
         const usageDate = section.date || service.date;
         if (!usageDate) continue;
-
-        // Show the most recent use relative to the service currently being planned.
         if (plan.date && usageDate > plan.date) continue;
-
         for (const item of section.items) {
           const current = usage.get(item.songId);
           if (!current || usageDate > current.date) {
-            usage.set(item.songId, {
-              date: usageDate,
-              serviceTitle: service.title,
-              sectionLabel: section.label
-            });
+            usage.set(item.songId, { date: usageDate, serviceTitle: service.title, sectionLabel: section.label });
           }
         }
       }
     }
-
     return usage;
   }, [services, plan.id, plan.date]);
 
@@ -113,12 +106,7 @@ export function ServicePlanner({ config, songs }: { config: AppConfig; songs: So
         ]
       }));
     } else {
-      setPlan((current) => ({
-        ...current,
-        kind,
-        title: current.title === "Fin de semana" ? "Culto" : current.title,
-        sections: [{ id: crypto.randomUUID(), label: "Canciones", items: [] }]
-      }));
+      setPlan((current) => ({ ...current, kind, title: current.title === "Fin de semana" ? "Culto" : current.title, sections: [{ id: crypto.randomUUID(), label: "Canciones", items: [] }] }));
     }
   }
 
@@ -126,12 +114,37 @@ export function ServicePlanner({ config, songs }: { config: AppConfig; songs: So
     return config.filterGroups.find((g) => g.id === groupId)?.options.find((o) => o.id === optionId)?.label || optionId;
   }
 
+  function tempoLabel(song?: Song) {
+    if (!song) return "";
+    const values = song.classifications["tempo"] || [];
+    return values.map((id) => optionLabel("tempo", id)).join(", ");
+  }
+
+  function durationForItem(item: ServiceItem) {
+    const stored = sanitizeDurationSeconds(item.durationSeconds);
+    if (stored) return stored;
+    const song = songsById.get(item.songId);
+    const video = song?.videos.find((candidate) => candidate.id === item.videoId);
+    return sanitizeDurationSeconds(video?.durationSeconds);
+  }
+
+  const activeDuration = useMemo(() => (activeSection?.items || []).reduce((sum, item) => sum + durationForItem(item), 0), [activeSection, songsById]);
+  const totalPlanDuration = useMemo(() => plan.sections.reduce((sum, section) => sum + section.items.reduce((sectionSum, item) => sectionSum + durationForItem(item), 0), 0), [plan.sections, songsById]);
+
   function addSong(song: Song) {
     if (!activeSection) return;
-    const usableVideos = song.videos.filter((video) => video.status === "usable");
+    const existingCount = activeSection.items.filter((item) => item.songId === song.id).length;
+    if (existingCount > 0) {
+      const repeatedLabel = existingCount === 1 ? "ya está agregada" : `ya está agregada ${existingCount} veces`;
+      const confirmed = window.confirm(`“${song.title}” ${repeatedLabel} en ${activeSection.label}. ¿Deseas agregarla nuevamente?`);
+      if (!confirmed) return;
+    }
+
+    const usableVideos = usableVideosMatchingTypes(song.videos, selectedVideoTypes);
     if (!usableVideos.length) return;
-    const videoId = selectedVideo[song.id] || usableVideos[0].id;
-    const video = usableVideos.find((item) => item.id === videoId) || usableVideos[0];
+    const preferred = preferredUsableVideo(song.videos, selectedVideoTypes) || getPrimaryUsableVideo(song.videos) || usableVideos[0];
+    const videoId = selectedVideo[song.id] || preferred.id;
+    const video = usableVideos.find((item) => item.id === videoId) || preferred;
     const item: ServiceItem = {
       songId: song.id,
       songTitle: song.title,
@@ -139,24 +152,17 @@ export function ServicePlanner({ config, songs }: { config: AppConfig; songs: So
       videoId: video.id,
       videoTitle: video.title,
       youtubeUrl: video.youtubeUrl,
-      videoTypeLabel: video.videoTypeIds[0] ? optionLabel("video-type", video.videoTypeIds[0]) : "YouTube"
+      videoTypeLabel: video.videoTypeIds[0] ? optionLabel("video-type", video.videoTypeIds[0]) : "YouTube",
+      durationSeconds: sanitizeDurationSeconds(video.durationSeconds)
     };
-
     setPlan((current) => ({
       ...current,
-      sections: current.sections.map((section) => section.id === activeSection.id
-        ? { ...section, items: [...section.items, item] }
-        : section)
+      sections: current.sections.map((section) => section.id === activeSection.id ? { ...section, items: [...section.items, item] } : section)
     }));
   }
 
   function removeItem(sectionId: string, index: number) {
-    setPlan((current) => ({
-      ...current,
-      sections: current.sections.map((section) => section.id === sectionId
-        ? { ...section, items: section.items.filter((_, i) => i !== index) }
-        : section)
-    }));
+    setPlan((current) => ({ ...current, sections: current.sections.map((section) => section.id === sectionId ? { ...section, items: section.items.filter((_, i) => i !== index) } : section) }));
   }
 
   function moveItem(sectionId: string, index: number, direction: -1 | 1) {
@@ -216,6 +222,7 @@ export function ServicePlanner({ config, songs }: { config: AppConfig; songs: So
       lines.push("", section.label);
       section.items.forEach((item, index) => lines.push(`${index + 1}. ${item.songTitle}${item.songArtist ? ` — ${item.songArtist}` : ""}: ${item.youtubeUrl}`));
     }
+    lines.push("", `Duración total estimada: ${totalPlanDuration ? formatDuration(totalPlanDuration) : "0:00"}`);
     return lines.join("\n");
   }
 
@@ -237,15 +244,8 @@ export function ServicePlanner({ config, songs }: { config: AppConfig; songs: So
   return (
     <div className="panel-stack">
       <div className="section-heading">
-        <div>
-          <span className="eyebrow">Planificación</span>
-          <h2>Preparar culto</h2>
-        </div>
-        <button type="button" className="secondary" onClick={() => {
-          const blank = newPlan();
-          setPlan(blank);
-          setActiveSectionId(blank.sections[0].id);
-        }}>+ Nuevo culto</button>
+        <div><span className="eyebrow">Planificación</span><h2>Preparar culto</h2></div>
+        <button type="button" className="secondary" onClick={() => { const blank = newPlan(); setPlan(blank); setActiveSectionId(blank.sections[0].id); }}>+ Nuevo culto</button>
       </div>
 
       {services.length > 0 && (
@@ -253,11 +253,7 @@ export function ServicePlanner({ config, songs }: { config: AppConfig; songs: So
           <div className="field-label">Cultos guardados</div>
           <div className="chips scroll-x">
             {services.slice(0, 30).map((service) => (
-              <button key={service.id} className={`chip ${plan.id === service.id ? "selected" : ""}`} onClick={() => {
-                const copy = clonePlan(service);
-                setPlan(copy);
-                setActiveSectionId(copy.sections[0]?.id || "");
-              }}>
+              <button key={service.id} className={`chip ${plan.id === service.id ? "selected" : ""}`} onClick={() => { const copy = clonePlan(service); setPlan(copy); setActiveSectionId(copy.sections[0]?.id || ""); }}>
                 {service.date} · {service.title}
               </button>
             ))}
@@ -267,14 +263,8 @@ export function ServicePlanner({ config, songs }: { config: AppConfig; songs: So
 
       <div className="planner-header-card">
         <div className="two-col">
-          <div>
-            <label className="field-label">Nombre</label>
-            <input value={plan.title} onChange={(e) => setPlan((current) => ({ ...current, title: e.target.value }))} />
-          </div>
-          <div>
-            <label className="field-label">Fecha principal</label>
-            <input type="date" value={plan.date} onChange={(e) => setPlan((current) => ({ ...current, date: e.target.value }))} />
-          </div>
+          <div><label className="field-label">Nombre</label><input value={plan.title} onChange={(e) => setPlan((current) => ({ ...current, title: e.target.value }))} /></div>
+          <div><label className="field-label">Fecha principal</label><input type="date" value={plan.date} onChange={(e) => setPlan((current) => ({ ...current, date: e.target.value }))} /></div>
         </div>
         <div className="filter-group">
           <div className="field-label">Formato</div>
@@ -288,9 +278,7 @@ export function ServicePlanner({ config, songs }: { config: AppConfig; songs: So
       <div className="planner-layout">
         <div className="service-list-card">
           <div className="section-tabs">
-            {plan.sections.map((section) => (
-              <button key={section.id} className={section.id === activeSection?.id ? "active" : ""} onClick={() => setActiveSectionId(section.id)}>{section.label} ({section.items.length})</button>
-            ))}
+            {plan.sections.map((section) => <button key={section.id} className={section.id === activeSection?.id ? "active" : ""} onClick={() => setActiveSectionId(section.id)}>{section.label} ({section.items.length})</button>)}
           </div>
 
           {plan.sections.map((section) => section.id === activeSection?.id && (
@@ -299,22 +287,35 @@ export function ServicePlanner({ config, songs }: { config: AppConfig; songs: So
                 <div className="empty-state">Busca canciones a la derecha y agrégalas a {section.label.toLowerCase()}.</div>
               ) : (
                 <ol className="service-items">
-                  {section.items.map((item, index) => (
-                    <li key={`${item.videoId}-${index}`}>
-                      <div className="service-item-main">
-                        <span className="order-number">{index + 1}</span>
-                        <div><strong>{item.songTitle}</strong><span>{item.songArtist ? `${item.songArtist} · ` : ""}{item.videoTypeLabel || "YouTube"}</span></div>
-                      </div>
-                      <div className="service-item-actions">
-                        <a href={item.youtubeUrl} target="_blank" rel="noreferrer" className="play-link">▶ Abrir</a>
-                        <button type="button" className="icon-button" disabled={index === 0} onClick={() => moveItem(section.id, index, -1)}>↑</button>
-                        <button type="button" className="icon-button" disabled={index === section.items.length - 1} onClick={() => moveItem(section.id, index, 1)}>↓</button>
-                        <button type="button" className="icon-button danger-text" onClick={() => removeItem(section.id, index)}>×</button>
-                      </div>
-                    </li>
-                  ))}
+                  {section.items.map((item, index) => {
+                    const song = songsById.get(item.songId);
+                    const tempo = tempoLabel(song);
+                    const duration = durationForItem(item);
+                    return (
+                      <li key={`${item.videoId}-${index}`}>
+                        <div className="service-item-main">
+                          <span className="order-number">{index + 1}</span>
+                          <div>
+                            <strong>{item.songTitle}</strong>
+                            <span>{[item.songArtist, item.videoTypeLabel || "YouTube", tempo, duration ? formatDuration(duration) : "Duración pendiente"].filter(Boolean).join(" · ")}</span>
+                          </div>
+                        </div>
+                        <div className="service-item-actions">
+                          {song && <button type="button" className="secondary compact-button" onClick={() => setDetails({ song, videoId: item.videoId })}>Detalles</button>}
+                          <a href={item.youtubeUrl} target="_blank" rel="noreferrer" className="play-link">▶ Abrir</a>
+                          <button type="button" className="icon-button" disabled={index === 0} onClick={() => moveItem(section.id, index, -1)}>↑</button>
+                          <button type="button" className="icon-button" disabled={index === section.items.length - 1} onClick={() => moveItem(section.id, index, 1)}>↓</button>
+                          <button type="button" className="icon-button danger-text" onClick={() => removeItem(section.id, index)}>×</button>
+                        </div>
+                      </li>
+                    );
+                  })}
                 </ol>
               )}
+              <div className="service-duration-summary">
+                <strong>Duración de {section.label}:</strong> {activeDuration ? formatDuration(activeDuration) : "0:00"}
+                {plan.sections.length > 1 && <span> · Total del plan: {totalPlanDuration ? formatDuration(totalPlanDuration) : "0:00"}</span>}
+              </div>
             </div>
           ))}
 
@@ -328,37 +329,42 @@ export function ServicePlanner({ config, songs }: { config: AppConfig; songs: So
 
         <div className="picker-card">
           <h3>Agregar a {activeSection?.label || "culto"}</h3>
-          <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Buscar por canción o artista…" />
+          <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Buscar por canción, artista o letra…" />
           <div className="compact-filters">
-            {config.filterGroups.map((group) => (
-              <FilterChips key={group.id} group={group} selected={filters[group.id] || []} onChange={(value) => setFilters((current) => ({ ...current, [group.id]: value }))} forceMultiSelect />
-            ))}
+            {config.filterGroups.map((group) => <FilterChips key={group.id} group={group} selected={filters[group.id] || []} onChange={(value) => setFilters((current) => ({ ...current, [group.id]: value }))} forceMultiSelect />)}
           </div>
           <div className="picker-results">
             {filteredSongs.map((song) => {
-              const usableVideos = song.videos.filter((video) => video.status === "usable");
+              const usableVideos = usableVideosMatchingTypes(song.videos, selectedVideoTypes);
               if (!usableVideos.length) return null;
-              const currentVideoId = selectedVideo[song.id] || usableVideos[0].id;
+              const preferred = preferredUsableVideo(song.videos, selectedVideoTypes) || getPrimaryUsableVideo(song.videos) || usableVideos[0];
+              const currentVideoId = usableVideos.some((video) => video.id === selectedVideo[song.id]) ? selectedVideo[song.id] : preferred.id;
+              const currentVideo = usableVideos.find((video) => video.id === currentVideoId) || preferred;
               const lastUsage = lastUsageBySong.get(song.id);
+              const tempo = tempoLabel(song);
               return (
                 <div className="picker-result" key={song.id}>
-                  <div>
+                  <div className="picker-result-info">
                     <strong>{song.title}</strong>
                     <span>{song.artist || "Artista sin registrar"}</span>
+                    <span className="picker-meta">{[tempo, formatDuration(currentVideo.durationSeconds)].filter(Boolean).join(" · ")}</span>
                     <span className={`song-last-used ${lastUsage ? "" : "never-used"}`}>
-                      {lastUsage
-                        ? `Último uso: ${formatServiceDate(lastUsage.date)} · ${lastUsage.serviceTitle}${lastUsage.sectionLabel !== "Canciones" ? ` / ${lastUsage.sectionLabel}` : ""}`
-                        : "Sin uso registrado en cultos guardados"}
+                      {lastUsage ? `Último uso: ${formatServiceDate(lastUsage.date)} · ${lastUsage.serviceTitle}${lastUsage.sectionLabel !== "Canciones" ? ` / ${lastUsage.sectionLabel}` : ""}` : "Sin uso registrado en cultos guardados"}
                     </span>
                     {usableVideos.length > 1 ? (
-                      <select value={currentVideoId} onChange={(e) => setSelectedVideo((current) => ({ ...current, [song.id]: e.target.value }))}>
-                        {usableVideos.map((video) => <option value={video.id} key={video.id}>{video.videoTypeIds[0] ? optionLabel("video-type", video.videoTypeIds[0]) : video.title}</option>)}
-                      </select>
-                    ) : (
-                      <span>{usableVideos[0].videoTypeIds[0] ? optionLabel("video-type", usableVideos[0].videoTypeIds[0]) : "YouTube"}</span>
-                    )}
+                      <label className="video-choice-label">
+                        <span>Versión a usar</span>
+                        <select value={currentVideoId} onChange={(e) => setSelectedVideo((current) => ({ ...current, [song.id]: e.target.value }))}>
+                          {usableVideos.map((video) => <option value={video.id} key={video.id}>{video.isPrimary ? "★ Principal · " : ""}{video.videoTypeIds[0] ? optionLabel("video-type", video.videoTypeIds[0]) : video.title} · {formatDuration(video.durationSeconds)}</option>)}
+                        </select>
+                      </label>
+                    ) : <span>{currentVideo.videoTypeIds[0] ? optionLabel("video-type", currentVideo.videoTypeIds[0]) : "YouTube"}{currentVideo.isPrimary ? " · Principal" : ""}</span>}
                   </div>
-                  <button type="button" className="small-primary" onClick={() => addSong(song)}>+ Agregar</button>
+                  <div className="picker-result-actions">
+                    <button type="button" className="secondary compact-button" onClick={() => setDetails({ song, videoId: currentVideo.id })}>Detalles</button>
+                    <a href={currentVideo.youtubeUrl} target="_blank" rel="noreferrer" className="secondary-button">▶ Abrir</a>
+                    <button type="button" className="small-primary" onClick={() => addSong(song)}>+ Agregar</button>
+                  </div>
                 </div>
               );
             })}
@@ -367,6 +373,7 @@ export function ServicePlanner({ config, songs }: { config: AppConfig; songs: So
       </div>
 
       {message && <div className="notice">{message}</div>}
+      {details && <SongDetailsModal song={details.song} config={config} selectedVideoId={details.videoId} onClose={() => setDetails(null)} />}
     </div>
   );
 }
