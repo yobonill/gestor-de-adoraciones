@@ -1,0 +1,1437 @@
+{
+  "schemaVersion": 1,
+  "exportedAt": "2026-10-11T11:26:16.568Z",
+  "config": {
+    "filterGroups": [
+      {
+        "id": "suitable-for",
+        "label": "Adecuada para",
+        "multiSelect": true,
+        "options": [
+          {
+            "active": true,
+            "id": "birthday",
+            "label": "Cumpleaños"
+          },
+          {
+            "active": true,
+            "id": "worship",
+            "label": "Adoración"
+          },
+          {
+            "active": true,
+            "id": "prayer",
+            "label": "Oración"
+          },
+          {
+            "active": true,
+            "id": "communion",
+            "label": "Santa Cena"
+          },
+          {
+            "active": true,
+            "id": "625808e4-9b39-4822-8ccb-e6fe3660b0ce",
+            "label": "Ofrendas"
+          },
+          {
+            "active": true,
+            "id": "f3e8c86e-43d5-4d33-aa4a-213c970b0ca7",
+            "label": "Otro"
+          }
+        ]
+      },
+      {
+        "id": "tempo",
+        "label": "Ritmo",
+        "multiSelect": false,
+        "options": [
+          {
+            "active": true,
+            "id": "slow",
+            "label": "Lenta"
+          },
+          {
+            "active": true,
+            "id": "medium",
+            "label": "Media"
+          },
+          {
+            "active": true,
+            "id": "fast",
+            "label": "Rápida"
+          }
+        ]
+      },
+      {
+        "id": "days",
+        "label": "Días",
+        "multiSelect": true,
+        "options": [
+          {
+            "active": true,
+            "id": "saturday",
+            "label": "Sábado"
+          },
+          {
+            "active": true,
+            "id": "sunday",
+            "label": "Domingo"
+          }
+        ]
+      },
+      {
+        "id": "song-type",
+        "label": "Tipo de canción",
+        "multiSelect": true,
+        "options": [
+          {
+            "active": true,
+            "id": "adoration",
+            "label": "Adoración/Alabanza"
+          },
+          {
+            "active": true,
+            "id": "humiliation",
+            "label": "Humillación"
+          },
+          {
+            "active": true,
+            "id": "exaltation",
+            "label": "Exaltación"
+          },
+          {
+            "active": true,
+            "id": "animation",
+            "label": "Animación"
+          },
+          {
+            "active": true,
+            "id": "reflection",
+            "label": "Reflexión"
+          },
+          {
+            "active": true,
+            "id": "eaedd5f7-14cf-46a0-8bc5-574cda555966",
+            "label": "Victoria"
+          },
+          {
+            "active": true,
+            "id": "3af3a48c-3038-4f4a-83a9-e7ef0f64afe6",
+            "label": "Perdon"
+          },
+          {
+            "active": true,
+            "id": "91b550d7-ae98-44ad-9bda-b5b5a1856ac0",
+            "label": "Bendición"
+          },
+          {
+            "active": true,
+            "id": "0535c5c0-5e5b-48b4-b62d-23d9b8c284b5",
+            "label": "Agradecimiento"
+          },
+          {
+            "active": true,
+            "id": "a30878b6-dd16-48e1-963b-f3202fa0e06a",
+            "label": "Fe"
+          },
+          {
+            "active": true,
+            "id": "94b27324-5337-4ec6-b491-f2851c2d4ec9",
+            "label": "Petición"
+          },
+          {
+            "active": true,
+            "id": "2161fe69-50b6-4c48-8a6e-57cd8472a143",
+            "label": "Fidelidad"
+          },
+          {
+            "active": true,
+            "id": "4af0beb5-ef6a-4510-b5a9-42690812d6fd",
+            "label": "Otro"
+          }
+        ]
+      },
+      {
+        "id": "video-type",
+        "label": "Tipo de video",
+        "multiSelect": true,
+        "options": [
+          {
+            "active": true,
+            "id": "lyrics",
+            "label": "Canción con letra"
+          },
+          {
+            "active": true,
+            "id": "karaoke",
+            "label": "Karaoke/Pista"
+          },
+          {
+            "active": true,
+            "id": "instrumental",
+            "label": "Instrumental"
+          },
+          {
+            "active": true,
+            "id": "24ea860a-7e15-4f38-b14b-b051d817edb1",
+            "label": "Canción sin letra"
+          },
+          {
+            "active": true,
+            "id": "music-video",
+            "label": "Video musical"
+          },
+          {
+            "active": true,
+            "id": "live",
+            "label": "En vivo"
+          },
+          {
+            "active": true,
+            "id": "795bbc76-3c88-4949-bd98-bab900ec19bc",
+            "label": "Otro"
+          }
+        ]
+      }
+    ]
+  },
+  "songs": [
+    {
+      "id": "-P32txEDljbtFIyaRBzZ",
+      "title": "Aquí estás",
+      "artist": "WAY MAKER",
+      "lyrics": "",
+      "search": {
+        "title": "AQUI ESTAS",
+        "artist": "WAY MAKER",
+        "lyrics": ""
+      },
+      "notes": "",
+      "status": "approved",
+      "proposedStatus": "approved",
+      "classifications": {
+        "days": [
+          "saturday",
+          "sunday"
+        ],
+        "song-type": [
+          "adoration",
+          "exaltation"
+        ],
+        "suitable-for": [
+          "worship",
+          "prayer"
+        ],
+        "tempo": [
+          "medium"
+        ]
+      },
+      "videos": [
+        {
+          "id": "2b561730-b021-40c7-901f-8d06f0efc817",
+          "youtubeVideoId": "DyPJV9qWiNc",
+          "youtubeUrl": "https://www.youtube.com/watch?v=DyPJV9qWiNc",
+          "title": "Aquí estás",
+          "thumbnailUrl": "https://i.ytimg.com/vi/DyPJV9qWiNc/hqdefault.jpg",
+          "videoTypeIds": [
+            "lyrics"
+          ],
+          "status": "usable",
+          "isPrimary": true,
+          "durationSeconds": 440
+        }
+      ],
+      "createdAt": "2026-10-03T22:34:47.714Z",
+      "updatedAt": "2026-10-11T11:12:09.071Z"
+    },
+    {
+      "id": "-P31wjuLMdD0IiQ6-HvS",
+      "title": "Arriesgate y cree",
+      "artist": "Isabel Valdez",
+      "lyrics": "",
+      "search": {
+        "title": "ARRIESGATE Y CREE",
+        "artist": "ISABEL VALDEZ",
+        "lyrics": ""
+      },
+      "notes": "",
+      "status": "approved",
+      "proposedStatus": "approved",
+      "classifications": {
+        "days": [
+          "sunday"
+        ],
+        "song-type": [
+          "animation",
+          "a30878b6-dd16-48e1-963b-f3202fa0e06a",
+          "91b550d7-ae98-44ad-9bda-b5b5a1856ac0"
+        ],
+        "suitable-for": [
+          "worship",
+          "f3e8c86e-43d5-4d33-aa4a-213c970b0ca7"
+        ],
+        "tempo": [
+          "slow"
+        ]
+      },
+      "videos": [
+        {
+          "id": "56ebeab7-02a6-4854-81e6-6698c3c3ec95",
+          "youtubeVideoId": "d61itAY6YCM",
+          "youtubeUrl": "https://www.youtube.com/watch?v=d61itAY6YCM",
+          "title": "Arriesgate y cree",
+          "thumbnailUrl": "https://i.ytimg.com/vi/d61itAY6YCM/hqdefault.jpg",
+          "videoTypeIds": [
+            "lyrics"
+          ],
+          "status": "usable",
+          "isPrimary": true,
+          "durationSeconds": 245
+        }
+      ],
+      "createdAt": "2026-10-03T18:07:21.740Z",
+      "updatedAt": "2026-10-11T11:12:25.226Z"
+    },
+    {
+      "id": "-P32-iJxuxkLbXcOiOdB",
+      "title": "Cara a Cara / Te Deseo",
+      "artist": "Majo y Dan feat. Marcos Vidal",
+      "lyrics": "",
+      "search": {
+        "title": "CARA A CARA / TE DESEO",
+        "artist": "MAJO Y DAN FEAT. MARCOS VIDAL",
+        "lyrics": ""
+      },
+      "notes": "",
+      "status": "approved",
+      "proposedStatus": "approved",
+      "classifications": {
+        "days": [
+          "saturday",
+          "sunday"
+        ],
+        "song-type": [
+          "adoration",
+          "humiliation",
+          "exaltation"
+        ],
+        "suitable-for": [
+          "worship"
+        ],
+        "tempo": [
+          "slow"
+        ]
+      },
+      "videos": [
+        {
+          "id": "e612a08b-4de5-4229-9959-94915a696f4b",
+          "youtubeVideoId": "JP-ynoI9HTY",
+          "youtubeUrl": "https://www.youtube.com/watch?v=JP-ynoI9HTY",
+          "title": "Cara a Cara / Te Deseo",
+          "thumbnailUrl": "https://i.ytimg.com/vi/JP-ynoI9HTY/hqdefault.jpg",
+          "videoTypeIds": [
+            "music-video"
+          ],
+          "status": "blacklisted",
+          "isPrimary": false,
+          "durationSeconds": 401
+        },
+        {
+          "id": "30544333-d475-4a11-8f28-84d78bc01628",
+          "youtubeVideoId": "RAVKwRheTdE",
+          "youtubeUrl": "https://www.youtube.com/watch?v=RAVKwRheTdE",
+          "title": "Cara a Cara / Te Deseo",
+          "thumbnailUrl": "https://i.ytimg.com/vi/RAVKwRheTdE/hqdefault.jpg",
+          "videoTypeIds": [
+            "lyrics"
+          ],
+          "status": "usable",
+          "isPrimary": true,
+          "durationSeconds": 396
+        }
+      ],
+      "createdAt": "2026-10-03T18:24:43.800Z",
+      "updatedAt": "2026-10-11T11:13:38.561Z"
+    },
+    {
+      "id": "-P31zojaPdzZkcnPH_9K",
+      "title": "Cuando Clamo A Ti Jehová",
+      "artist": "Estanislao Marino",
+      "lyrics": "",
+      "search": {
+        "title": "CUANDO CLAMO A TI JEHOVA",
+        "artist": "ESTANISLAO MARINO",
+        "lyrics": ""
+      },
+      "notes": "",
+      "status": "approved",
+      "proposedStatus": "approved",
+      "classifications": {
+        "days": [
+          "saturday",
+          "sunday"
+        ],
+        "song-type": [
+          "adoration",
+          "exaltation"
+        ],
+        "suitable-for": [
+          "worship"
+        ],
+        "tempo": [
+          "slow"
+        ]
+      },
+      "videos": [
+        {
+          "id": "b0e0e67e-30bf-4fa4-8e3d-18e8072e87f5",
+          "youtubeVideoId": "v4_2brp0fkc",
+          "youtubeUrl": "https://www.youtube.com/watch?v=v4_2brp0fkc",
+          "title": "Cuando Clamo A Ti Jehová",
+          "thumbnailUrl": "https://i.ytimg.com/vi/v4_2brp0fkc/hqdefault.jpg",
+          "videoTypeIds": [
+            "lyrics"
+          ],
+          "status": "usable",
+          "isPrimary": true,
+          "durationSeconds": 0
+        }
+      ],
+      "createdAt": "2026-10-03T18:20:47.939Z",
+      "updatedAt": "2026-10-03T22:28:27.765Z"
+    },
+    {
+      "id": "-P31w-I7qFJCa7yiaEkU",
+      "title": "EL ALFARERO",
+      "artist": "Alex Campos & Veronica Leal",
+      "lyrics": "",
+      "search": {
+        "title": "EL ALFARERO",
+        "artist": "ALEX CAMPOS & VERONICA LEAL",
+        "lyrics": ""
+      },
+      "notes": "",
+      "status": "blacklisted",
+      "proposedStatus": "approved",
+      "blacklistReason": "Es un video musical",
+      "classifications": {
+        "days": [
+          "sunday",
+          "saturday"
+        ],
+        "song-type": [
+          "humiliation"
+        ],
+        "suitable-for": [
+          "worship"
+        ],
+        "tempo": [
+          "slow"
+        ]
+      },
+      "videos": [
+        {
+          "id": "edc68c56-fad6-4f61-b46a-8a85fc8a3b5f",
+          "youtubeVideoId": "nyIgLCGsgGQ",
+          "youtubeUrl": "https://www.youtube.com/watch?v=nyIgLCGsgGQ",
+          "title": "EL ALFARERO",
+          "thumbnailUrl": "https://i.ytimg.com/vi/nyIgLCGsgGQ/hqdefault.jpg",
+          "videoTypeIds": [
+            "music-video",
+            "live"
+          ],
+          "status": "blacklisted",
+          "isPrimary": false,
+          "durationSeconds": 0
+        }
+      ],
+      "createdAt": "2026-10-03T18:04:06.724Z",
+      "updatedAt": "2026-10-11T10:45:40.987Z"
+    },
+    {
+      "id": "-P3DDSIxD9DbTOSD4p2J",
+      "title": "ÉL ES SANTO",
+      "artist": "Raisa Díaz",
+      "lyrics": "",
+      "search": {
+        "title": "EL ES SANTO",
+        "artist": "RAISA DIAZ",
+        "lyrics": ""
+      },
+      "notes": "",
+      "status": "rejected",
+      "proposedStatus": "approved",
+      "classifications": {
+        "days": [
+          "saturday",
+          "sunday"
+        ],
+        "song-type": [
+          "adoration",
+          "exaltation"
+        ],
+        "suitable-for": [
+          "worship"
+        ],
+        "tempo": [
+          "fast"
+        ]
+      },
+      "videos": [
+        {
+          "id": "7fc57bf3-00e8-4b72-b430-60f04806db38",
+          "youtubeVideoId": "Cc-iW7Pcrpo",
+          "youtubeUrl": "https://www.youtube.com/watch?v=Cc-iW7Pcrpo",
+          "title": "ÉL ES SANTO",
+          "thumbnailUrl": "https://i.ytimg.com/vi/Cc-iW7Pcrpo/hqdefault.jpg",
+          "videoTypeIds": [
+            "music-video"
+          ],
+          "status": "usable",
+          "isPrimary": true,
+          "durationSeconds": 0
+        }
+      ],
+      "createdAt": "2026-10-05T22:40:33.647Z",
+      "updatedAt": "2026-10-11T10:11:33.454Z"
+    },
+    {
+      "id": "-P32uWSYy-H7DlE4iKM4",
+      "title": "ERES FIEL",
+      "artist": "Coalo Zamorano",
+      "lyrics": "",
+      "search": {
+        "title": "ERES FIEL",
+        "artist": "COALO ZAMORANO",
+        "lyrics": ""
+      },
+      "notes": "",
+      "status": "approved",
+      "proposedStatus": "approved",
+      "classifications": {
+        "days": [
+          "sunday",
+          "saturday"
+        ],
+        "song-type": [
+          "adoration",
+          "2161fe69-50b6-4c48-8a6e-57cd8472a143",
+          "exaltation"
+        ],
+        "suitable-for": [
+          "worship"
+        ],
+        "tempo": [
+          "medium"
+        ]
+      },
+      "videos": [
+        {
+          "id": "f2d50737-a115-44ba-9d56-13967af17f18",
+          "youtubeVideoId": "QLrDPQOhDhg",
+          "youtubeUrl": "https://www.youtube.com/watch?v=QLrDPQOhDhg",
+          "title": "ERES FIEL",
+          "thumbnailUrl": "https://i.ytimg.com/vi/QLrDPQOhDhg/hqdefault.jpg",
+          "videoTypeIds": [
+            "lyrics"
+          ],
+          "status": "usable",
+          "isPrimary": true,
+          "durationSeconds": 0
+        }
+      ],
+      "createdAt": "2026-10-03T22:37:16.088Z",
+      "updatedAt": "2026-10-03T22:38:38.987Z"
+    },
+    {
+      "id": "-P3UymiiDxVPtk6pqrIx",
+      "title": "Este es mi deseo",
+      "artist": "Claudio Freidson",
+      "lyrics": "",
+      "search": {
+        "title": "ESTE ES MI DESEO",
+        "artist": "CLAUDIO FREIDSON",
+        "lyrics": ""
+      },
+      "notes": "",
+      "status": "approved",
+      "proposedStatus": "approved",
+      "classifications": {
+        "days": [
+          "saturday",
+          "sunday"
+        ],
+        "song-type": [
+          "humiliation",
+          "adoration"
+        ],
+        "suitable-for": [
+          "prayer",
+          "worship"
+        ],
+        "tempo": [
+          "slow"
+        ]
+      },
+      "videos": [
+        {
+          "id": "7b3c9905-a43f-4936-8438-b0fa9b7311d4",
+          "youtubeVideoId": "XEzb2IWFbp8",
+          "youtubeUrl": "https://www.youtube.com/watch?v=XEzb2IWFbp8",
+          "title": "Este es mi deseo",
+          "thumbnailUrl": "https://i.ytimg.com/vi/XEzb2IWFbp8/hqdefault.jpg",
+          "videoTypeIds": [
+            "lyrics"
+          ],
+          "status": "usable",
+          "isPrimary": true,
+          "durationSeconds": 0
+        }
+      ],
+      "createdAt": "2026-10-09T09:25:16.883Z",
+      "updatedAt": "2026-10-11T09:48:31.140Z"
+    },
+    {
+      "id": "-P3RGn1IG4DObBFWGuyl",
+      "title": "Gracia Sublime Es",
+      "artist": "En Espíritu y En Verdad",
+      "lyrics": "",
+      "search": {
+        "title": "GRACIA SUBLIME ES",
+        "artist": "EN ESPIRITU Y EN VERDAD",
+        "lyrics": ""
+      },
+      "notes": "",
+      "status": "approved",
+      "proposedStatus": "approved",
+      "classifications": {
+        "days": [
+          "saturday",
+          "sunday"
+        ],
+        "song-type": [
+          "adoration",
+          "0535c5c0-5e5b-48b4-b62d-23d9b8c284b5"
+        ],
+        "suitable-for": [
+          "worship"
+        ],
+        "tempo": [
+          "medium"
+        ]
+      },
+      "videos": [
+        {
+          "id": "8317df21-e563-4e27-953d-587d336e3fc8",
+          "youtubeVideoId": "0pOVNIsyIXM",
+          "youtubeUrl": "https://www.youtube.com/watch?v=0pOVNIsyIXM",
+          "title": "Gracia Sublime Es",
+          "thumbnailUrl": "https://i.ytimg.com/vi/0pOVNIsyIXM/hqdefault.jpg",
+          "videoTypeIds": [
+            "lyrics"
+          ],
+          "status": "usable",
+          "isPrimary": true,
+          "durationSeconds": 315
+        }
+      ],
+      "createdAt": "2026-10-08T16:09:50.061Z",
+      "updatedAt": "2026-10-11T11:22:53.549Z"
+    },
+    {
+      "id": "-P32uowB7TzIjRSgPFCW",
+      "title": "Grande y Fuerte es nuestro Dios",
+      "artist": "Miel San Marcos",
+      "lyrics": "",
+      "search": {
+        "title": "GRANDE Y FUERTE ES NUESTRO DIOS",
+        "artist": "MIEL SAN MARCOS",
+        "lyrics": ""
+      },
+      "notes": "",
+      "status": "approved",
+      "proposedStatus": "approved",
+      "classifications": {
+        "days": [
+          "sunday",
+          "saturday"
+        ],
+        "song-type": [
+          "adoration",
+          "exaltation"
+        ],
+        "suitable-for": [
+          "worship",
+          "625808e4-9b39-4822-8ccb-e6fe3660b0ce"
+        ],
+        "tempo": [
+          "medium"
+        ]
+      },
+      "videos": [
+        {
+          "id": "11ea234d-4e67-42a8-8db6-2bc87191b995",
+          "youtubeVideoId": "QTrs_GLDZUg",
+          "youtubeUrl": "https://www.youtube.com/watch?v=QTrs_GLDZUg",
+          "title": "Grande y Fuerte es nuestro Dios",
+          "thumbnailUrl": "https://i.ytimg.com/vi/QTrs_GLDZUg/hqdefault.jpg",
+          "videoTypeIds": [
+            "lyrics"
+          ],
+          "status": "usable",
+          "isPrimary": true,
+          "durationSeconds": 0
+        }
+      ],
+      "createdAt": "2026-10-03T22:38:35.873Z",
+      "updatedAt": "2026-10-03T22:38:40.089Z"
+    },
+    {
+      "id": "-P3eY4bvC-Lj4TsuBTSe",
+      "title": "Inexplicable",
+      "artist": "Denicher Pol",
+      "lyrics": "¿Qué tiene tu espíritu\nQue, cuando me tocas\nMe haces temblar?\nY ¿qué es tu presencia\nQue, al manifestarse\nTengo que llorar?\nY es que soy tan pequeño\nQue, al tú tocarme, siento\nQue voy a desmayar\nEs que sé que a tu presencia\nNo hay aquí en la Tierra\nCon qué comparar\nNo te puedo mirar\nNi te puedo tocar\nNo ha llegado el momento\nY hay veces que, en mi afán\nCreo que ya tú no estás\nPero vuelvo y te siento\nY cuando me tocas\nCon tu Santo Espíritu\nLloro, canto, y tiemblo\nY cuando me tocas\nCon tu Santo Espíritu\nLloro, canto, y tiemblo\n¿Qué hay en tu interior?\n¿Qué sientes por mí?\nDime cómo me amas\n¿Qué misterio existe\nQue mis duras pruebas\nConviertes en calma?\nYo sé que a tu presencia\nToda la Tierra tiembla\nY también tiembla mi alma\nY cuando me tocas\nCon tu Santo Espíritu\nMe das la bonanza\nNo te puedo mirar\nNi te puedo tocar\nNo ha llegado el momento\nY hay veces que, en mi afán\nCreo que ya tú no estás\nPero vuelvo y te siento\nNo te puedo mirar\nNi te puedo tocar\nNo ha llegado el momento\nY hay veces que, en mi afán\nCreo que ya tú no estás\nPero vuelvo y te siento\nY cuando me tocas\nCon tu Santo Espíritu\nLloro, canto, y tiemblo\nY cuando me tocas\nCon tu Santo Espíritu\nLloro, canto, y tiemblo",
+      "search": {
+        "title": "INEXPLICABLE",
+        "artist": "DENICHER POL",
+        "lyrics": "¿QUE TIENE TU ESPIRITU QUE, CUANDO ME TOCAS ME HACES TEMBLAR? Y ¿QUE ES TU PRESENCIA QUE, AL MANIFESTARSE TENGO QUE LLORAR? Y ES QUE SOY TAN PEQUENO QUE, AL TU TOCARME, SIENTO QUE VOY A DESMAYAR ES QUE SE QUE A TU PRESENCIA NO HAY AQUI EN LA TIERRA CON QUE COMPARAR NO TE PUEDO MIRAR NI TE PUEDO TOCAR NO HA LLEGADO EL MOMENTO Y HAY VECES QUE, EN MI AFAN CREO QUE YA TU NO ESTAS PERO VUELVO Y TE SIENTO Y CUANDO ME TOCAS CON TU SANTO ESPIRITU LLORO, CANTO, Y TIEMBLO Y CUANDO ME TOCAS CON TU SANTO ESPIRITU LLORO, CANTO, Y TIEMBLO ¿QUE HAY EN TU INTERIOR? ¿QUE SIENTES POR MI? DIME COMO ME AMAS ¿QUE MISTERIO EXISTE QUE MIS DURAS PRUEBAS CONVIERTES EN CALMA? YO SE QUE A TU PRESENCIA TODA LA TIERRA TIEMBLA Y TAMBIEN TIEMBLA MI ALMA Y CUANDO ME TOCAS CON TU SANTO ESPIRITU ME DAS LA BONANZA NO TE PUEDO MIRAR NI TE PUEDO TOCAR NO HA LLEGADO EL MOMENTO Y HAY VECES QUE, EN MI AFAN CREO QUE YA TU NO ESTAS PERO VUELVO Y TE SIENTO NO TE PUEDO MIRAR NI TE PUEDO TOCAR NO HA LLEGADO EL MOMENTO Y HAY VECES QUE, EN MI AFAN CREO QUE YA TU NO ESTAS PERO VUELVO Y TE SIENTO Y CUANDO ME TOCAS CON TU SANTO ESPIRITU LLORO, CANTO, Y TIEMBLO Y CUANDO ME TOCAS CON TU SANTO ESPIRITU LLORO, CANTO, Y TIEMBLO"
+      },
+      "notes": "",
+      "status": "approved",
+      "proposedStatus": "approved",
+      "classifications": {
+        "days": [
+          "saturday",
+          "sunday"
+        ],
+        "song-type": [
+          "adoration",
+          "exaltation"
+        ],
+        "suitable-for": [
+          "worship"
+        ],
+        "tempo": [
+          "slow"
+        ]
+      },
+      "videos": [
+        {
+          "id": "c16bc1e6-8450-4b56-90b0-66d360cf8d56",
+          "youtubeVideoId": "Gkddyrkilp0",
+          "youtubeUrl": "https://www.youtube.com/watch?v=Gkddyrkilp0",
+          "title": "Inexplicable",
+          "thumbnailUrl": "https://i.ytimg.com/vi/Gkddyrkilp0/hqdefault.jpg",
+          "videoTypeIds": [
+            "lyrics"
+          ],
+          "status": "usable",
+          "isPrimary": true,
+          "durationSeconds": 312
+        },
+        {
+          "id": "8a6ad8d9-6d60-4877-a459-b793f4dcfbb4",
+          "youtubeVideoId": "ocPPZvJ8kwM",
+          "youtubeUrl": "https://www.youtube.com/watch?v=ocPPZvJ8kwM",
+          "title": "Inexplicable",
+          "thumbnailUrl": "https://i.ytimg.com/vi/ocPPZvJ8kwM/hqdefault.jpg",
+          "videoTypeIds": [
+            "music-video"
+          ],
+          "status": "blacklisted",
+          "isPrimary": false,
+          "durationSeconds": 312,
+          "blacklistReason": "Es un video musical"
+        }
+      ],
+      "createdAt": "2026-10-11T10:40:03.015Z",
+      "updatedAt": "2026-10-11T10:42:05.942Z"
+    },
+    {
+      "id": "-P32u4OT_oytk44gS4cl",
+      "title": "LA TIERRA CANTA",
+      "artist": "Barak",
+      "lyrics": "",
+      "search": {
+        "title": "LA TIERRA CANTA",
+        "artist": "BARAK",
+        "lyrics": ""
+      },
+      "notes": "",
+      "status": "approved",
+      "proposedStatus": "approved",
+      "classifications": {
+        "days": [
+          "saturday",
+          "sunday"
+        ],
+        "song-type": [
+          "exaltation",
+          "adoration"
+        ],
+        "suitable-for": [
+          "worship",
+          "625808e4-9b39-4822-8ccb-e6fe3660b0ce"
+        ],
+        "tempo": [
+          "medium"
+        ]
+      },
+      "videos": [
+        {
+          "id": "aae5f90b-7ee8-4a73-98e6-d50bc4b4e736",
+          "youtubeVideoId": "BuBcOc_PiMw",
+          "youtubeUrl": "https://www.youtube.com/watch?v=BuBcOc_PiMw",
+          "title": "LA TIERRA CANTA",
+          "thumbnailUrl": "https://i.ytimg.com/vi/BuBcOc_PiMw/hqdefault.jpg",
+          "videoTypeIds": [
+            "lyrics"
+          ],
+          "status": "usable",
+          "isPrimary": true,
+          "durationSeconds": 0
+        }
+      ],
+      "createdAt": "2026-10-03T22:35:21.139Z",
+      "updatedAt": "2026-10-03T22:38:41.166Z"
+    },
+    {
+      "id": "-P3_l2p9Agrxo71_-PUq",
+      "title": "Queremos a Cristo proclamar",
+      "artist": "Carlos Arzola",
+      "lyrics": "",
+      "search": {
+        "title": "QUEREMOS A CRISTO PROCLAMAR",
+        "artist": "CARLOS ARZOLA",
+        "lyrics": ""
+      },
+      "notes": "",
+      "status": "approved",
+      "proposedStatus": "approved",
+      "classifications": {
+        "days": [
+          "saturday",
+          "sunday"
+        ],
+        "song-type": [
+          "animation",
+          "94b27324-5337-4ec6-b491-f2851c2d4ec9"
+        ],
+        "suitable-for": [
+          "worship",
+          "625808e4-9b39-4822-8ccb-e6fe3660b0ce"
+        ],
+        "tempo": [
+          "medium"
+        ]
+      },
+      "videos": [
+        {
+          "id": "0a0db4b0-2b7b-4459-a00c-ed09af5bfc40",
+          "youtubeVideoId": "C3foih0f9Jg",
+          "youtubeUrl": "https://www.youtube.com/watch?v=C3foih0f9Jg",
+          "title": "Queremos a Cristo proclamar",
+          "thumbnailUrl": "https://i.ytimg.com/vi/C3foih0f9Jg/hqdefault.jpg",
+          "videoTypeIds": [
+            "lyrics"
+          ],
+          "status": "usable",
+          "isPrimary": true,
+          "durationSeconds": 0
+        }
+      ],
+      "createdAt": "2026-10-10T12:23:00.211Z",
+      "updatedAt": "2026-10-11T09:54:40.095Z"
+    },
+    {
+      "id": "-P3bc9ZXS4nwDDEqSJsE",
+      "title": "Rey Eterno",
+      "artist": "Alejandro Del Bosque",
+      "lyrics": "",
+      "search": {
+        "title": "REY ETERNO",
+        "artist": "ALEJANDRO DEL BOSQUE",
+        "lyrics": ""
+      },
+      "notes": "",
+      "status": "approved",
+      "proposedStatus": "approved",
+      "classifications": {
+        "days": [
+          "saturday",
+          "sunday"
+        ],
+        "song-type": [
+          "adoration",
+          "exaltation"
+        ],
+        "suitable-for": [
+          "worship"
+        ],
+        "tempo": [
+          "medium"
+        ]
+      },
+      "videos": [
+        {
+          "id": "e248dea6-eb90-43ec-9834-9359d0d9fea7",
+          "youtubeVideoId": "0wg0UsXsrCU",
+          "youtubeUrl": "https://www.youtube.com/watch?v=0wg0UsXsrCU",
+          "title": "Rey Eterno",
+          "thumbnailUrl": "https://i.ytimg.com/vi/0wg0UsXsrCU/hqdefault.jpg",
+          "videoTypeIds": [
+            "lyrics"
+          ],
+          "status": "usable",
+          "isPrimary": true,
+          "durationSeconds": 253
+        },
+        {
+          "id": "3d3e031b-9c1c-4441-a107-0c9c201cd531",
+          "youtubeVideoId": "m3fIEuS_Oe4",
+          "youtubeUrl": "https://www.youtube.com/watch?v=m3fIEuS_Oe4",
+          "title": "Rey Eterno",
+          "thumbnailUrl": "https://i.ytimg.com/vi/m3fIEuS_Oe4/hqdefault.jpg",
+          "videoTypeIds": [
+            "24ea860a-7e15-4f38-b14b-b051d817edb1"
+          ],
+          "status": "blacklisted",
+          "isPrimary": false,
+          "durationSeconds": 0,
+          "blacklistReason": "sin letra"
+        }
+      ],
+      "createdAt": "2026-10-10T21:03:22.961Z",
+      "updatedAt": "2026-10-11T11:23:49.005Z"
+    },
+    {
+      "id": "-P32uD0P3OpntBG6Jpxk",
+      "title": "Santo es el que Vive",
+      "artist": "Grace y Adoración",
+      "lyrics": "",
+      "search": {
+        "title": "SANTO ES EL QUE VIVE",
+        "artist": "GRACE Y ADORACION",
+        "lyrics": ""
+      },
+      "notes": "",
+      "status": "approved",
+      "proposedStatus": "approved",
+      "classifications": {
+        "days": [
+          "saturday",
+          "sunday"
+        ],
+        "song-type": [
+          "adoration",
+          "exaltation"
+        ],
+        "suitable-for": [
+          "worship"
+        ],
+        "tempo": [
+          "medium"
+        ]
+      },
+      "videos": [
+        {
+          "id": "dbb447a7-15e5-4fad-b161-ef505de0c5fb",
+          "youtubeVideoId": "7tx28valGNI",
+          "youtubeUrl": "https://www.youtube.com/watch?v=7tx28valGNI",
+          "title": "Santo es el que Vive",
+          "thumbnailUrl": "https://i.ytimg.com/vi/7tx28valGNI/hqdefault.jpg",
+          "videoTypeIds": [
+            "lyrics"
+          ],
+          "status": "usable",
+          "isPrimary": true,
+          "durationSeconds": 314
+        }
+      ],
+      "createdAt": "2026-10-03T22:35:56.462Z",
+      "updatedAt": "2026-10-11T11:23:15.834Z"
+    },
+    {
+      "id": "-P32tkcSY7k9X3Er-DYx",
+      "title": "Si te tengo a ti, lo tengo todo",
+      "artist": "Marcos Brunet",
+      "lyrics": "",
+      "search": {
+        "title": "SI TE TENGO A TI, LO TENGO TODO",
+        "artist": "MARCOS BRUNET",
+        "lyrics": ""
+      },
+      "notes": "",
+      "status": "approved",
+      "proposedStatus": "approved",
+      "classifications": {
+        "days": [
+          "sunday",
+          "saturday"
+        ],
+        "song-type": [
+          "adoration",
+          "exaltation",
+          "humiliation",
+          "0535c5c0-5e5b-48b4-b62d-23d9b8c284b5"
+        ],
+        "suitable-for": [
+          "worship",
+          "prayer"
+        ],
+        "tempo": [
+          "slow"
+        ]
+      },
+      "videos": [
+        {
+          "id": "5ef3781d-fa4f-442d-b52f-8fe1a00a6c54",
+          "youtubeVideoId": "7Ne9cbREOnk",
+          "youtubeUrl": "https://www.youtube.com/watch?v=7Ne9cbREOnk",
+          "title": "Si te tengo a ti, lo tengo todo",
+          "thumbnailUrl": "https://i.ytimg.com/vi/7Ne9cbREOnk/hqdefault.jpg",
+          "videoTypeIds": [
+            "lyrics"
+          ],
+          "status": "usable",
+          "isPrimary": true,
+          "durationSeconds": 0
+        }
+      ],
+      "createdAt": "2026-10-03T22:33:56.081Z",
+      "updatedAt": "2026-10-03T22:38:42.452Z"
+    },
+    {
+      "id": "-P3bbnqKX38JoINAGjY0",
+      "title": "Sobre La Cruz",
+      "artist": "Alejandro Del Bosque",
+      "lyrics": "",
+      "search": {
+        "title": "SOBRE LA CRUZ",
+        "artist": "ALEJANDRO DEL BOSQUE",
+        "lyrics": ""
+      },
+      "notes": "",
+      "status": "approved",
+      "proposedStatus": "approved",
+      "classifications": {
+        "days": [
+          "saturday",
+          "sunday"
+        ],
+        "song-type": [
+          "adoration",
+          "exaltation",
+          "0535c5c0-5e5b-48b4-b62d-23d9b8c284b5",
+          "2161fe69-50b6-4c48-8a6e-57cd8472a143"
+        ],
+        "suitable-for": [
+          "worship"
+        ],
+        "tempo": [
+          "medium"
+        ]
+      },
+      "videos": [
+        {
+          "id": "69035702-24ac-43d1-8463-009aaddf964c",
+          "youtubeVideoId": "niUd7N05NTI",
+          "youtubeUrl": "https://www.youtube.com/watch?v=niUd7N05NTI",
+          "title": "Sobre La Cruz",
+          "thumbnailUrl": "https://i.ytimg.com/vi/niUd7N05NTI/hqdefault.jpg",
+          "videoTypeIds": [
+            "24ea860a-7e15-4f38-b14b-b051d817edb1"
+          ],
+          "status": "blacklisted",
+          "isPrimary": false,
+          "durationSeconds": 0,
+          "blacklistReason": "no tiene letra, es solo uan imagen"
+        },
+        {
+          "id": "f30a8ab0-637e-4885-b032-596844dfb998",
+          "youtubeVideoId": "nX49kZZb01E",
+          "youtubeUrl": "https://www.youtube.com/watch?v=nX49kZZb01E",
+          "title": "Sobre La Cruz",
+          "thumbnailUrl": "https://i.ytimg.com/vi/nX49kZZb01E/hqdefault.jpg",
+          "videoTypeIds": [
+            "lyrics"
+          ],
+          "status": "usable",
+          "isPrimary": true,
+          "durationSeconds": 0
+        }
+      ],
+      "createdAt": "2026-10-10T21:01:49.894Z",
+      "updatedAt": "2026-10-11T10:18:52.724Z"
+    },
+    {
+      "id": "-P2xYoooA9n090RewEF_",
+      "title": "TEMPRANO YO TE BUSCARE",
+      "artist": "Marcos Witt",
+      "lyrics": "",
+      "search": {
+        "title": "TEMPRANO YO TE BUSCARE",
+        "artist": "MARCOS WITT",
+        "lyrics": ""
+      },
+      "notes": "",
+      "status": "approved",
+      "proposedStatus": "approved",
+      "classifications": {
+        "days": [
+          "saturday",
+          "sunday"
+        ],
+        "song-type": [
+          "adoration",
+          "humiliation"
+        ],
+        "suitable-for": [
+          "worship",
+          "prayer"
+        ],
+        "tempo": [
+          "slow"
+        ]
+      },
+      "videos": [
+        {
+          "id": "f14ec030-2704-4c31-b00d-fca73616e8ea",
+          "youtubeVideoId": "ADt2wYV6cwM",
+          "youtubeUrl": "https://www.youtube.com/watch?v=ADt2wYV6cwM",
+          "title": "TEMPRANO YO TE BUSCARE",
+          "thumbnailUrl": "https://i.ytimg.com/vi/ADt2wYV6cwM/hqdefault.jpg",
+          "videoTypeIds": [
+            "lyrics"
+          ],
+          "status": "usable",
+          "isPrimary": true,
+          "durationSeconds": 0
+        }
+      ],
+      "createdAt": "2026-10-02T17:00:21.160Z",
+      "updatedAt": "2026-10-02T17:12:02.716Z"
+    },
+    {
+      "id": "-P31xyZLajz13wfkvTGo",
+      "title": "Todo lo has cambiado",
+      "artist": "Danilo Montero",
+      "lyrics": "",
+      "search": {
+        "title": "TODO LO HAS CAMBIADO",
+        "artist": "DANILO MONTERO",
+        "lyrics": ""
+      },
+      "notes": "",
+      "status": "approved",
+      "proposedStatus": "approved",
+      "classifications": {
+        "days": [
+          "saturday"
+        ],
+        "song-type": [
+          "animation"
+        ],
+        "suitable-for": [
+          "worship"
+        ],
+        "tempo": [
+          "fast"
+        ]
+      },
+      "videos": [
+        {
+          "id": "09486ff5-f621-4f83-a959-cfd2cda8f2a9",
+          "youtubeVideoId": "G8YZnLK1wCI",
+          "youtubeUrl": "https://www.youtube.com/watch?v=G8YZnLK1wCI",
+          "title": "Todo lo has cambiado",
+          "thumbnailUrl": "https://i.ytimg.com/vi/G8YZnLK1wCI/hqdefault.jpg",
+          "videoTypeIds": [
+            "lyrics"
+          ],
+          "status": "usable",
+          "isPrimary": true,
+          "durationSeconds": 0
+        }
+      ],
+      "createdAt": "2026-10-03T18:12:43.918Z",
+      "updatedAt": "2026-10-03T22:32:26.263Z"
+    },
+    {
+      "id": "-P31ypbdEQzAdW3mSWbz",
+      "title": "TU PALABRA",
+      "artist": "Johan Paulino y René González",
+      "lyrics": "",
+      "search": {
+        "title": "TU PALABRA",
+        "artist": "JOHAN PAULINO Y RENE GONZALEZ",
+        "lyrics": ""
+      },
+      "notes": "",
+      "status": "approved",
+      "proposedStatus": "approved",
+      "classifications": {
+        "days": [
+          "saturday",
+          "sunday"
+        ],
+        "song-type": [
+          "humiliation"
+        ],
+        "suitable-for": [
+          "worship"
+        ],
+        "tempo": [
+          "slow"
+        ]
+      },
+      "videos": [
+        {
+          "id": "46cbd559-1eed-44bc-a823-e64eb65f4132",
+          "youtubeVideoId": "cVzWDjHePvs",
+          "youtubeUrl": "https://www.youtube.com/watch?v=cVzWDjHePvs",
+          "title": "TU PALABRA",
+          "thumbnailUrl": "https://i.ytimg.com/vi/cVzWDjHePvs/hqdefault.jpg",
+          "videoTypeIds": [
+            "lyrics"
+          ],
+          "status": "usable",
+          "isPrimary": true,
+          "durationSeconds": 0
+        }
+      ],
+      "createdAt": "2026-10-03T18:16:29.405Z",
+      "updatedAt": "2026-10-03T22:32:34.268Z"
+    },
+    {
+      "id": "-P31xWQ83TqtKEhUtItn",
+      "title": "Vida Tú Me Das",
+      "artist": "Hillsong Young & Free",
+      "lyrics": "",
+      "search": {
+        "title": "VIDA TU ME DAS",
+        "artist": "HILLSONG YOUNG & FREE",
+        "lyrics": ""
+      },
+      "notes": "",
+      "status": "approved",
+      "proposedStatus": "approved",
+      "classifications": {
+        "days": [
+          "saturday"
+        ],
+        "song-type": [
+          "animation"
+        ],
+        "suitable-for": [
+          "worship"
+        ],
+        "tempo": [
+          "fast"
+        ]
+      },
+      "videos": [
+        {
+          "id": "762dd9f9-0575-4564-a089-c5b44fd827fe",
+          "youtubeVideoId": "QSchFaoTipk",
+          "youtubeUrl": "https://www.youtube.com/watch?v=QSchFaoTipk",
+          "title": "Vida Tú Me Das",
+          "thumbnailUrl": "https://i.ytimg.com/vi/QSchFaoTipk/hqdefault.jpg",
+          "videoTypeIds": [
+            "lyrics"
+          ],
+          "status": "usable",
+          "isPrimary": true,
+          "durationSeconds": 0
+        }
+      ],
+      "createdAt": "2026-10-03T18:10:44.542Z",
+      "updatedAt": "2026-10-03T22:33:04.832Z"
+    },
+    {
+      "id": "-P31zSZvGzKa8gjInqka",
+      "title": "Yahweh",
+      "artist": "Ariza",
+      "lyrics": "",
+      "search": {
+        "title": "YAHWEH",
+        "artist": "ARIZA",
+        "lyrics": ""
+      },
+      "notes": "",
+      "status": "approved",
+      "proposedStatus": "approved",
+      "classifications": {
+        "days": [
+          "saturday",
+          "sunday"
+        ],
+        "song-type": [
+          "adoration",
+          "0535c5c0-5e5b-48b4-b62d-23d9b8c284b5"
+        ],
+        "suitable-for": [
+          "worship"
+        ],
+        "tempo": [
+          "medium"
+        ]
+      },
+      "videos": [
+        {
+          "id": "1aade61f-7e61-4ad6-a267-9661f4a53ccc",
+          "youtubeVideoId": "SxWnaMIZSQk",
+          "youtubeUrl": "https://www.youtube.com/watch?v=SxWnaMIZSQk",
+          "title": "Yahweh",
+          "thumbnailUrl": "https://i.ytimg.com/vi/SxWnaMIZSQk/hqdefault.jpg",
+          "videoTypeIds": [
+            "lyrics",
+            "music-video"
+          ],
+          "status": "blacklisted",
+          "isPrimary": false,
+          "durationSeconds": 253,
+          "blacklistReason": "Debemos evitar los videos en vivo en las adoraciones para evitar distracciones"
+        },
+        {
+          "id": "2c01db61-479c-41e9-b60f-3ca64c19f6c6",
+          "youtubeVideoId": "pF-tyoVQcsA",
+          "youtubeUrl": "https://www.youtube.com/watch?v=pF-tyoVQcsA",
+          "title": "Yahweh",
+          "thumbnailUrl": "https://i.ytimg.com/vi/pF-tyoVQcsA/hqdefault.jpg",
+          "videoTypeIds": [
+            "lyrics"
+          ],
+          "status": "usable",
+          "isPrimary": true,
+          "durationSeconds": 0
+        }
+      ],
+      "createdAt": "2026-10-03T18:19:13.076Z",
+      "updatedAt": "2026-10-11T11:25:46.754Z"
+    }
+  ],
+  "servicePlans": [
+    {
+      "id": "-P3egdce0g9wO_ODVI_L",
+      "title": "Domingo",
+      "kind": "weekend",
+      "date": "2026-10-11",
+      "sections": [
+        {
+          "id": "8b98c83f-9cf6-419d-a005-b850a8bc5cbd",
+          "label": "Sábado",
+          "items": []
+        },
+        {
+          "id": "c14adc6a-b386-4882-8ab9-a3aec064e7ee",
+          "label": "Domingo",
+          "items": [
+            {
+              "songId": "-P3RGn1IG4DObBFWGuyl",
+              "songTitle": "Gracia Sublime Es",
+              "songArtist": "En Espíritu y En Verdad",
+              "videoId": "8317df21-e563-4e27-953d-587d336e3fc8",
+              "videoTitle": "Gracia Sublime Es",
+              "youtubeUrl": "https://www.youtube.com/watch?v=0pOVNIsyIXM",
+              "videoTypeLabel": "Canción con letra",
+              "durationSeconds": 0
+            },
+            {
+              "songId": "-P31zSZvGzKa8gjInqka",
+              "songTitle": "Yahweh",
+              "songArtist": "Ariza",
+              "videoId": "2c01db61-479c-41e9-b60f-3ca64c19f6c6",
+              "videoTitle": "Yahweh",
+              "youtubeUrl": "https://www.youtube.com/watch?v=pF-tyoVQcsA",
+              "videoTypeLabel": "Canción con letra",
+              "durationSeconds": 0
+            },
+            {
+              "songId": "-P32uD0P3OpntBG6Jpxk",
+              "songTitle": "Santo es el que Vive",
+              "songArtist": "Grace y Adoración",
+              "videoId": "dbb447a7-15e5-4fad-b161-ef505de0c5fb",
+              "videoTitle": "Santo es el que Vive",
+              "youtubeUrl": "https://www.youtube.com/watch?v=7tx28valGNI",
+              "videoTypeLabel": "Canción con letra",
+              "durationSeconds": 0
+            },
+            {
+              "songId": "-P3bc9ZXS4nwDDEqSJsE",
+              "songTitle": "Rey Eterno",
+              "songArtist": "Alejandro Del Bosque",
+              "videoId": "e248dea6-eb90-43ec-9834-9359d0d9fea7",
+              "videoTitle": "Rey Eterno",
+              "youtubeUrl": "https://www.youtube.com/watch?v=0wg0UsXsrCU",
+              "videoTypeLabel": "Canción con letra",
+              "durationSeconds": 0
+            }
+          ]
+        }
+      ],
+      "updatedAt": "2026-10-11T11:25:23.811Z"
+    },
+    {
+      "id": "-P36Fa4sRGFyCg9--Wvk",
+      "title": "Domingo-04",
+      "kind": "weekend",
+      "date": "2026-10-04",
+      "sections": [
+        {
+          "id": "4c6a7f35-7060-48ab-a5aa-82e83dc44706",
+          "label": "Sábado",
+          "items": [
+            {
+              "songId": "-P31xWQ83TqtKEhUtItn",
+              "songTitle": "Vida Tú Me Das",
+              "songArtist": "Hillsong Young & Free",
+              "videoId": "762dd9f9-0575-4564-a089-c5b44fd827fe",
+              "videoTitle": "Vida Tú Me Das",
+              "youtubeUrl": "https://www.youtube.com/watch?v=QSchFaoTipk",
+              "videoTypeLabel": "Canción con letra",
+              "durationSeconds": 0
+            },
+            {
+              "songId": "-P32txEDljbtFIyaRBzZ",
+              "songTitle": "Aquí estás",
+              "songArtist": "WAY MAKER",
+              "videoId": "2b561730-b021-40c7-901f-8d06f0efc817",
+              "videoTitle": "Aquí estás",
+              "youtubeUrl": "https://www.youtube.com/watch?v=DyPJV9qWiNc",
+              "videoTypeLabel": "Canción con letra",
+              "durationSeconds": 0
+            },
+            {
+              "songId": "-P32uWSYy-H7DlE4iKM4",
+              "songTitle": "ERES FIEL",
+              "songArtist": "Coalo Zamorano",
+              "videoId": "f2d50737-a115-44ba-9d56-13967af17f18",
+              "videoTitle": "ERES FIEL",
+              "youtubeUrl": "https://www.youtube.com/watch?v=QLrDPQOhDhg",
+              "videoTypeLabel": "Canción con letra",
+              "durationSeconds": 0
+            },
+            {
+              "songId": "-P31xyZLajz13wfkvTGo",
+              "songTitle": "Todo lo has cambiado",
+              "songArtist": "Danilo Montero",
+              "videoId": "09486ff5-f621-4f83-a959-cfd2cda8f2a9",
+              "videoTitle": "Todo lo has cambiado",
+              "youtubeUrl": "https://www.youtube.com/watch?v=G8YZnLK1wCI",
+              "videoTypeLabel": "Canción con letra",
+              "durationSeconds": 0
+            }
+          ]
+        },
+        {
+          "id": "119f2dfd-68fc-40a4-bd5c-f6c81001fc38",
+          "label": "Domingo",
+          "items": []
+        }
+      ],
+      "createdAt": "2026-10-04T14:12:33.566Z",
+      "updatedAt": "2026-10-04T14:12:33.566Z"
+    }
+  ]
+}

@@ -1,12 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
 import type { AppConfig, ServiceItem, ServicePlan, Song } from "@/types";
-import { deleteService, saveService, subscribeServices } from "@/lib/database";
-import { requireAdminCode } from "@/lib/adminCode";
+import { deleteService, saveService, subscribeServices, updateSong } from "@/lib/database";
+import { getAdminCode, requireAdminCode, verifyAdminCode } from "@/lib/adminCode";
 import { songMatchesFilters } from "@/lib/filters";
 import { FilterChips } from "./FilterChips";
 import { normalizeTextKey } from "@/lib/text";
 import { formatDuration, sanitizeDurationSeconds } from "@/lib/duration";
 import { SongDetailsModal } from "./SongDetailsModal";
+import { EditSongModal } from "./SearchPanel";
 import { getPrimaryUsableVideo, preferredUsableVideo, usableVideosMatchingTypes } from "@/lib/videos";
 
 function todayLocal() {
@@ -41,7 +42,7 @@ function formatServiceDate(date: string) {
   return new Intl.DateTimeFormat("es-DO", { day: "numeric", month: "short", year: "numeric" }).format(new Date(Date.UTC(year, month - 1, day)));
 }
 
-export function ServicePlanner({ config, songs }: { config: AppConfig; songs: Song[] }) {
+export function ServicePlanner({ config, songs, allSongs = songs }: { config: AppConfig; songs: Song[]; allSongs?: Song[] }) {
   const [services, setServices] = useState<ServicePlan[]>([]);
   const [plan, setPlan] = useState<ServicePlan>(() => newPlan());
   const [activeSectionId, setActiveSectionId] = useState("");
@@ -49,6 +50,8 @@ export function ServicePlanner({ config, songs }: { config: AppConfig; songs: So
   const [query, setQuery] = useState("");
   const [selectedVideo, setSelectedVideo] = useState<Record<string, string>>({});
   const [details, setDetails] = useState<{ song: Song; videoId?: string } | null>(null);
+  const [editingSong, setEditingSong] = useState<Song | null>(null);
+  const [editBusy, setEditBusy] = useState(false);
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
 
@@ -59,6 +62,7 @@ export function ServicePlanner({ config, songs }: { config: AppConfig; songs: So
   useEffect(() => subscribeServices(setServices), []);
 
   const songsById = useMemo(() => new Map(songs.map((song) => [song.id, song])), [songs]);
+  const adminUnlocked = verifyAdminCode(getAdminCode());
   const selectedVideoTypes = filters["video-type"] || [];
 
   const filteredSongs = useMemo(() => {
@@ -179,6 +183,51 @@ export function ServicePlanner({ config, songs }: { config: AppConfig; songs: So
     }));
   }
 
+  function beginEditSong(song: Song) {
+    setEditingSong(JSON.parse(JSON.stringify(song)) as Song);
+  }
+
+  async function saveSongEdit() {
+    if (!editingSong) return;
+    setEditBusy(true);
+    setMessage("");
+    try {
+      await requireAdminCode();
+      const updatedSong = { ...editingSong, updatedAt: new Date().toISOString() };
+      await updateSong(updatedSong);
+
+      setPlan((current) => ({
+        ...current,
+        sections: current.sections.map((section) => ({
+          ...section,
+          items: section.items.map((item) => {
+            if (item.songId !== updatedSong.id) return item;
+            const video = updatedSong.videos.find((candidate) => candidate.id === item.videoId)
+              || getPrimaryUsableVideo(updatedSong.videos);
+            if (!video) return { ...item, songTitle: updatedSong.title, songArtist: updatedSong.artist };
+            return {
+              ...item,
+              songTitle: updatedSong.title,
+              songArtist: updatedSong.artist,
+              videoId: video.id,
+              videoTitle: video.title,
+              youtubeUrl: video.youtubeUrl,
+              videoTypeLabel: video.videoTypeIds[0] ? optionLabel("video-type", video.videoTypeIds[0]) : "YouTube",
+              durationSeconds: sanitizeDurationSeconds(video.durationSeconds)
+            };
+          })
+        }))
+      }));
+
+      setEditingSong(null);
+      setMessage("Canción actualizada.");
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "No se pudo actualizar la canción.");
+    } finally {
+      setEditBusy(false);
+    }
+  }
+
   async function savePlan() {
     if (!plan.title.trim() || !plan.date) {
       setMessage("Completa el nombre y la fecha.");
@@ -297,11 +346,18 @@ export function ServicePlanner({ config, songs }: { config: AppConfig; songs: So
                           <span className="order-number">{index + 1}</span>
                           <div>
                             <strong>{item.songTitle}</strong>
-                            <span>{[item.songArtist, item.videoTypeLabel || "YouTube", tempo, duration ? formatDuration(duration) : "Duración pendiente"].filter(Boolean).join(" · ")}</span>
+                            <span>
+                              {[item.songArtist, item.videoTypeLabel || "YouTube", tempo].filter(Boolean).join(" · ")}
+                              {(item.songArtist || item.videoTypeLabel || tempo) && " · "}
+                              <strong>{duration ? formatDuration(duration) : "Duración pendiente"}</strong>
+                            </span>
                           </div>
                         </div>
                         <div className="service-item-actions">
-                          {song && <button type="button" className="secondary compact-button" onClick={() => setDetails({ song, videoId: item.videoId })}>Detalles</button>}
+                          {song && (adminUnlocked
+                            ? <button type="button" className="secondary compact-button" onClick={() => beginEditSong(song)}>Editar</button>
+                            : <button type="button" className="secondary compact-button" onClick={() => setDetails({ song, videoId: item.videoId })}>Detalles</button>
+                          )}
                           <a href={item.youtubeUrl} target="_blank" rel="noreferrer" className="play-link">▶ Abrir</a>
                           <button type="button" className="icon-button" disabled={index === 0} onClick={() => moveItem(section.id, index, -1)}>↑</button>
                           <button type="button" className="icon-button" disabled={index === section.items.length - 1} onClick={() => moveItem(section.id, index, 1)}>↓</button>
@@ -373,6 +429,7 @@ export function ServicePlanner({ config, songs }: { config: AppConfig; songs: So
       </div>
 
       {message && <div className="notice">{message}</div>}
+      {editingSong && <EditSongModal song={editingSong} allSongs={allSongs} config={config} onChange={setEditingSong} onClose={() => setEditingSong(null)} onSave={() => void saveSongEdit()} busy={editBusy} />}
       {details && <SongDetailsModal song={details.song} config={config} selectedVideoId={details.videoId} onClose={() => setDetails(null)} />}
     </div>
   );

@@ -66,7 +66,7 @@ export function App() {
         {dataError && <div className="notice warning">{dataError}</div>}
         {!dataError && tab === "add" && <AddSongPanel config={config} songs={songs} />}
         {!dataError && tab === "search" && <SearchPanel config={config} songs={songs} />}
-        {!dataError && tab === "service" && <ServicePlanner config={config} songs={songs.filter((song) => song.status === "approved")} />}
+        {!dataError && tab === "service" && <ServicePlanner config={config} songs={songs.filter((song) => song.status === "approved")} allSongs={songs} />}
         {!dataError && tab === "config" && <ConfigPanel config={config} songs={songs} />}
       </section>
 

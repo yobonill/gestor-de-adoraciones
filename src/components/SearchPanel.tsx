@@ -152,7 +152,7 @@ export function SearchPanel({ config, songs }: { config: AppConfig; songs: Song[
   );
 }
 
-function EditSongModal({ song, allSongs, config, onChange, onClose, onSave, busy }: {
+export function EditSongModal({ song, allSongs, config, onChange, onClose, onSave, busy }: {
   song: Song;
   allSongs: Song[];
   config: AppConfig;
