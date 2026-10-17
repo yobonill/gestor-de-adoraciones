@@ -236,7 +236,6 @@ export function ServicePlanner({ config, songs, allSongs = songs }: { config: Ap
     setBusy(true);
     setMessage("");
     try {
-      await requireAdminCode();
       const id = await saveService(plan);
       if (!plan.id) setPlan((current) => ({ ...current, id }));
       setMessage("Culto guardado.");
